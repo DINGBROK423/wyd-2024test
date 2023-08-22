@@ -85,7 +85,7 @@ static struct {
 	/* TODO: Add more commands */
 { "si", "one step", cmd_si},
 {"info","printf",cmd_info},
-{"EXPR","screan",cmd_x},
+{"x","screan",cmd_x},
 };
 
 #define NR_CMD (sizeof(cmd_table) / sizeof(cmd_table[0]))
