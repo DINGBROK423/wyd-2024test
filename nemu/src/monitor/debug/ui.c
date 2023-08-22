@@ -44,14 +44,14 @@ static int cmd_si(char *args) {
 }
 static int cmd_help(char *args);
 static int cmd_info(char *args) {
-	if (args[0] == 'r') {
-		int homo;
-		for (homo = R_EAX; homo <= R_EDI ; homo++) {
-			printf("$%s\t0x%08x\n", regsl[homo], reg_l(homo));
-		}
-		printf("$eip\t0x%08x\n", cpu.eip);
-	}
-	return 0;
+    if (args[0] == 'r') {
+        int homo;
+        for (homo = R_EAX; homo <= R_EDI ; homo++) {
+            printf("$%s\t0x%08x\t%d\n", regsl[homo], reg_l(homo), reg_l(homo));
+        }
+        printf("$eip\t0x%08x\t%d\n", cpu.eip, cpu.eip);
+    }
+    return 0;
 }
 
 static struct {
