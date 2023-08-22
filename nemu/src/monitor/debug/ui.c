@@ -43,6 +43,16 @@ static int cmd_si(char *args) {
 	return 0;
 }
 static int cmd_help(char *args);
+static int cmd_info(char *args) {
+	if (args[0] == 'r') {
+		int i;
+		for (i = R_EAX; i <= R_EDI ; i++) {
+			printf("$%s\t0x%08x\n", regsl[i], reg_l(i));
+		}
+		printf("$eip\t0x%08x\n", cpu.eip);
+	}
+	return 0;
+}
 
 static struct {
 	char *name;
@@ -55,6 +65,7 @@ static struct {
 
 	/* TODO: Add more commands */
 { "si", "one step", cmd_si},
+{"info","printf",cmd_info},
 };
 
 #define NR_CMD (sizeof(cmd_table) / sizeof(cmd_table[0]))
