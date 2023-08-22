@@ -53,6 +53,25 @@ static int cmd_info(char *args) {
     }
     return 0;
 }
+static int cmd_x(char *args){  
+    char *N = strtok(NULL," ");  
+    char *EXPR = strtok(NULL," ");  
+    int len;  
+    lnaddr_t address;  
+      
+    sscanf(N, "%d", &len);  
+    sscanf(EXPR, "%x", &address);  
+      
+    printf("0x%x:",address);  
+    int i;
+    for(i = 0; i < len; i ++){  
+        printf("%08x ",lnaddr_read(address,4));  
+        address += 4;  
+    }  
+    printf("\n");  
+    return 0;  
+}
+
 
 static struct {
 	char *name;
@@ -66,6 +85,7 @@ static struct {
 	/* TODO: Add more commands */
 { "si", "one step", cmd_si},
 {"info","printf",cmd_info},
+{"EXPR","screan",cmd_x},
 };
 
 #define NR_CMD (sizeof(cmd_table) / sizeof(cmd_table[0]))
