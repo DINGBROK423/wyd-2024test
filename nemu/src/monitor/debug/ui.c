@@ -45,9 +45,9 @@ static int cmd_si(char *args) {
 static int cmd_help(char *args);
 static int cmd_info(char *args) {
 	if (args[0] == 'r') {
-		int i;
-		for (i = R_EAX; i <= R_EDI ; i++) {
-			printf("$%s\t0x%08x\n", regsl[i], reg_l(i));
+		int homo;
+		for (homo = R_EAX; homo <= R_EDI ; homo++) {
+			printf("$%s\t0x%08x\n", regsl[homo], reg_l(homo));
 		}
 		printf("$eip\t0x%08x\n", cpu.eip);
 	}
