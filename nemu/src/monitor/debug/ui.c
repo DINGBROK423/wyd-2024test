@@ -35,8 +35,43 @@ static int cmd_c(char *args) {
 static int cmd_q(char *args) {
 	return -1;
 }
-
+static int cmd_si(char *args) {
+	int step;
+	if (args == NULL) step = 1;
+	else sscanf(args, "%d", &step);
+	cpu_exec(step);
+	return 0;
+}
 static int cmd_help(char *args);
+static int cmd_info(char *args) {
+    if (args[0] == 'r') {
+        int homo;
+        for (homo = R_EAX; homo <= R_EDI ; homo++) {
+            printf("$%s\t0x%08x\t%d\n", regsl[homo], reg_l(homo), reg_l(homo));
+        }
+        printf("$eip\t0x%08x\t%d\n", cpu.eip, cpu.eip);
+    }
+    return 0;
+}
+static int cmd_x(char *args){  
+    char *N = strtok(NULL," ");  
+    char *EXPR = strtok(NULL," ");  
+    int len;  
+    lnaddr_t address;  
+      
+    sscanf(N, "%d", &len);  
+    sscanf(EXPR, "%x", &address);  
+      
+    printf("0x%x:",address);  
+    int i;
+    for(i = 0; i < len; i ++){  
+        printf("%08x ",lnaddr_read(address,4));  
+        address += 4;  
+    }  
+    printf("\n");  
+    return 0;  
+}
+
 
 static struct {
 	char *name;
@@ -48,7 +83,9 @@ static struct {
 	{ "q", "Exit NEMU", cmd_q },
 
 	/* TODO: Add more commands */
-
+{ "si", "one step", cmd_si},
+{"info","printf",cmd_info},
+{"x","screan",cmd_x},
 };
 
 #define NR_CMD (sizeof(cmd_table) / sizeof(cmd_table[0]))
