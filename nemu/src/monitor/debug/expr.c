@@ -342,7 +342,6 @@ uint32_t eval(int p, int q){
 					return result;
 				}
 			}
-		}
 		else if (tokens[p].type == NEG){
 			sscanf(tokens[q].str, "%d", &result);
 			return -result;
@@ -382,7 +381,7 @@ uint32_t eval(int p, int q){
 				assert(0);
 				return 0;
 			}
-		
+		}
 	}
 	val1 = eval(p, op - 1);
 	val2 = eval(op + 1, q);
