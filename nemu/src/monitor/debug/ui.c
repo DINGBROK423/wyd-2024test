@@ -93,13 +93,12 @@ static int cmd_x(char *args){
 	printf("\n");
 	return 0;
 }
-static int cmd_p(char *args) {
-	bool success;
-
-	if(args) {
-		uint32_t r = expr(args, &success);
-		if(success) { printf("0x%08x(%d)\n", r, r); }
-		else { printf("Bad expression\n"); }
+static int cmd_p(char *args){
+	bool *success = false;
+	int i;
+	i = expr(args, success);
+	if (!success){
+		printf("%d\n", i);
 	}
 	return 0;
 }
