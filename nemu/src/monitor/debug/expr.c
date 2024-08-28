@@ -15,8 +15,9 @@ enum {
 	NOTEQ = 5,
 	OR = 6,
 	AND = 7,
-	POINT, NEG,REF,REG
+	POINT, NEG
 	/* TODO: Add more token types */
+
 };
 
 static struct rule {
@@ -44,11 +45,12 @@ static struct rule {
 	
 	{"\\(", '('},
 	{"\\)", ')'},
-	{"\\$[a-z]{1,31}", REG},		// register names 
+	
 	{"\\|\\|", OR},
 	{"&&", AND},
 	{"!", '!'},
 };
+
 
 #define NR_REGEX (sizeof(rules) / sizeof(rules[0]) )
 
@@ -105,6 +107,7 @@ static bool make_token(char *e) {
 				for (j = 0; j < 32; j++){ //清空
 					tokens[nr_token].str[j] = '\0';
 				}
+				
 				switch(rules[i].token_type) {
 					case 256:
 						break;
@@ -171,8 +174,8 @@ static bool make_token(char *e) {
 						tokens[nr_token].type = ')';
 						nr_token++;
 						break;
-					case REG: sprintf(tokens[nr_token].str, "%.*s", substr_len, substr_start);
-					default: panic("please implement me");
+					default: 
+						assert(0);
 				}
 
 				break;
@@ -265,7 +268,7 @@ int dominant_operator(int p, int q){
 //这个函数实现了带有负数的求值以及更复杂的运算
 uint32_t eval(int p, int q){
 	int result = 0;
-	int op;
+	int op=0;
 	int val1, val2;
 	if (p > q){
 		assert(0);
@@ -304,120 +307,82 @@ uint32_t eval(int p, int q){
 				}
 		} else {
 			assert(0);
-			}
+		}
 	 } else if (check_parentheses(p, q) == true){
 	 	return eval(p + 1, q - 1);
 	 } else {
 		op = dominant_operator(p, q);
 	 	if (op == -2){
 			assert(0);
-		} else if (op == -1){
-			if(tokens[p].type == POINT){
-				if (!strcmp(tokens[p + 2].str, "$eax")){
-					result = swaddr_read(cpu.eax, 4);
+		} else if (tokens[p].type == '!'){
+				sscanf(tokens[q].str, "%d", &result);
+				return !result;
+			} else if (tokens[p].type == RESGISTER) {
+				if (!strcmp(tokens[p].str, "$eax")){
+					result = cpu.eax;
 					return result;
-				} else if (!strcmp(tokens[p + 2].str, "$ecx")){
-					result = swaddr_read(cpu.ecx, 4);
+				} else if (!strcmp(tokens[p].str, "$ecx")){
+					result = cpu.ecx;
 					return result;
-				} else if (!strcmp(tokens[p + 2].str, "$edx")){
-					result = swaddr_read(cpu.edx, 4);
+				} else if (!strcmp(tokens[p].str, "$edx")){
+					result = cpu.edx;
 					return result;
-				} else if (!strcmp(tokens[p + 2].str, "$ebx")){
-					result = swaddr_read(cpu.ebx, 4);
+				} else if (!strcmp(tokens[p].str, "$ebx")){
+					result = cpu.ebx;
 					return result;
-				} else if (!strcmp(tokens[p + 2].str, "$esp")){
-					result = swaddr_read(cpu.esp, 4);
+				} else if (!strcmp(tokens[p].str, "$esp")){
+					result = cpu.esp;
 					return result;
-				} else if (!strcmp(tokens[p + 2].str, "$ebp")){
-					result = swaddr_read(cpu.ebp, 4);
+				} else if (!strcmp(tokens[p].str, "$ebp")){
+					result = cpu.ebp;
 					return result;
-				} else if (!strcmp(tokens[p + 2].str, "$esi")){
-					result = swaddr_read(cpu.esi, 4);
+				} else if (!strcmp(tokens[p].str, "$esi")){
+					result = cpu.esi;
 					return result;
-				} else if (!strcmp(tokens[p + 2].str, "$edi")){
-					result = swaddr_read(cpu.edi, 4);
+				} else if (!strcmp(tokens[p].str, "$edi")){
+					result = cpu.edi;
 					return result;
-				} else if (!strcmp(tokens[p + 2].str, "$eip")){
-					result = swaddr_read(cpu.eip, 4);
+				} else if (!strcmp(tokens[p].str, "$eip")){
+					result = cpu.eip;
 					return result;
+				} else {
+					assert(0);
+					return 0;
 				}
 			}
-		else if (tokens[p].type == NEG){
-			sscanf(tokens[q].str, "%d", &result);
-			return -result;
 		}
-		else if (tokens[p].type == '!'){
-			sscanf(tokens[q].str, "%d", &result);
-			return !result;
-		} else if (tokens[p].type == RESGISTER) {
-			if (!strcmp(tokens[p].str, "$eax")){
-				result = cpu.eax;
-				return result;
-			} else if (!strcmp(tokens[p].str, "$ecx")){
-				result = cpu.ecx;
-				return result;
-			} else if (!strcmp(tokens[p].str, "$edx")){
-				result = cpu.edx;
-				return result;
-			} else if (!strcmp(tokens[p].str, "$ebx")){
-				result = cpu.ebx;
-				return result;
-			} else if (!strcmp(tokens[p].str, "$esp")){
-				result = cpu.esp;
-				return result;
-			} else if (!strcmp(tokens[p].str, "$ebp")){
-				result = cpu.ebp;
-				return result;
-			} else if (!strcmp(tokens[p].str, "$esi")){
-				result = cpu.esi;
-				return result;
-			} else if (!strcmp(tokens[p].str, "$edi")){
-				result = cpu.edi;
-				return result;
-			} else if (!strcmp(tokens[p].str, "$eip")){
-				result = cpu.eip;
-				return result;
-			} else {
-				assert(0);
-				return 0;
-			}
-		}
-	}
-	val1 = eval(p, op - 1);
-	val2 = eval(op + 1, q);
+		val1 = eval(p, op - 1);
+		val2 = eval(op + 1, q);
 
-	switch (tokens[op].type){
-		case '+' : return val1 + val2;	
-		case '-' : return val1 - val2;
-		case '*' : return val1 * val2;
-		case '/' : return val1 / val2;
-		case OR : return val1 || val2;
-		case AND : return val1 && val2;
-		case EQ : 
-				if (val1 == val2){
-				return 1;
-				} else {
-				return 0;
-				}
-		case NOTEQ :
-				if (val1 != val2){
-				return 1;
-				} else {
-				return 0;
-				}
-		default : assert(0);
-	}
-	}
+		switch (tokens[op].type){
+			case '+' : return val1 + val2;	
+			case '-' : return val1 - val2;
+			case '*' : return val1 * val2;
+			case '/' : return val1 / val2;
+			case OR : return val1 || val2;
+			case AND : return val1 && val2;
+			case EQ : 
+				   if (val1 == val2){
+					return 1;
+				   } else {
+					return 0;
+				   }
+			case NOTEQ :
+				   if (val1 != val2){
+					return 1;
+				    } else {
+					return 0;
+				    }
+			default : assert(0);
+		}
+	 
 	return 0;
 }
-
 uint32_t expr(char *e, bool *success) {
     if(!make_token(e)) {
 		*success = false;
 		return 0;
 	}
-
-	/* TODO: Insert codes to evaluate the expression. */
 	int i;
 	for (i = 0; i < nr_token; i++){
 		if (tokens[i].type == '*' && (i == 0 || (tokens[i - 1].type != NUM && tokens[i - 1].type != HEX && tokens[i - 1].type != ')'))){
@@ -427,8 +392,7 @@ uint32_t expr(char *e, bool *success) {
 			tokens[i].type = NEG;
 		}
 	}
-//	panic("please implement me");
 	return eval(0, nr_token - 1);
-//	return 0;
 }
+
 
