@@ -427,8 +427,8 @@ uint32_t expr(char *e, bool *success) {
 			tokens[i].type = NEG;
 		}
 	}
-	panic("please implement me");
+//	panic("please implement me");
 	return eval(0, nr_token - 1);
-	return 0;
+//	return 0;
 }
 
