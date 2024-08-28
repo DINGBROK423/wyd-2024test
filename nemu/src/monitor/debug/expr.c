@@ -15,7 +15,7 @@ enum {
 	NOTEQ = 5,
 	OR = 6,
 	AND = 7,
-	POINT, NEG,REF,REG
+	POINT, NEG
 	/* TODO: Add more token types */
 };
 
@@ -44,7 +44,7 @@ static struct rule {
 	
 	{"\\(", '('},
 	{"\\)", ')'},
-	{"\\$[a-z]{1,31}", REG},		// register names 
+	
 	{"\\|\\|", OR},
 	{"&&", AND},
 	{"!", '!'},
@@ -171,7 +171,6 @@ static bool make_token(char *e) {
 						tokens[nr_token].type = ')';
 						nr_token++;
 						break;
-					case REG: sprintf(tokens[nr_token].str, "%.*s", substr_len, substr_start);
 					default: panic("please implement me");
 				}
 
