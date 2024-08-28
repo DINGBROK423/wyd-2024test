@@ -37,7 +37,63 @@ static int cmd_q(char *args) {
 }
 
 static int cmd_help(char *args);
+static int cmd_si(char *args){
+	char *sencondWord = strtok(NULL," ");
+	int step = 0;
+	int i;
+	if (sencondWord == NULL){
+		cpu_exec(1);
+		return 0;	
+	}
+	sscanf(sencondWord, "%d", &step);
+	if (step <= 0){
+		printf("MISINIPUT\n");
+		return 0;
+	}
+	for (i = 0; i < step; i++){
+		cpu_exec(1);
+	}
+	return 0;
+}
+static int cmd_info(char *args){
+	char *sencondWord = strtok(NULL," ");
+	int i;
+	if (strcmp(sencondWord, "r") == 0){
+		for (i = 0; i < 8; i++){
+			printf("%s\t\t", regsl[i]);
+			printf("0x%08x\t\t%d\n", cpu.gpr[i]._32, cpu.gpr[i]._32);
+		}
+		printf("eip\t\t0x%08x\t\t%d\n", cpu.eip, cpu.eip);
+	return 0;
+	}
+	printf("MISINPUT\n");
+	return 0;
+}
+static int cmd_x(char *args){
+	char *sencondWord = strtok(NULL," ");
+	char *thirdWord = strtok(NULL, " ");
+	
+	int step = 0;
+	swaddr_t address;
+	
+	sscanf(sencondWord, "%d", &step);
+	sscanf(thirdWord, "%x", &address);
 
+	int i, j = 0;
+	for (i = 0; i < step; i++){
+		if (j % 4 == 0){
+			printf("0x%x:", address);
+		}
+		printf("0x%08x ", swaddr_read(address, 4));
+		address += 4;
+		j++;
+		if (j % 4 == 0){
+			printf("\n");
+		}
+			}
+	printf("\n");
+	return 0;
+}
 static struct {
 	char *name;
 	char *description;
@@ -46,7 +102,9 @@ static struct {
 	{ "help", "Display informations about all supported commands", cmd_help },
 	{ "c", "Continue the execution of the program", cmd_c },
 	{ "q", "Exit NEMU", cmd_q },
-
+	{ "si", "One step", cmd_si },
+	{ "info", "Display all informations of regisiters", cmd_info },
+	{ "x", "Scan Memory", cmd_x },
 	/* TODO: Add more commands */
 
 };
