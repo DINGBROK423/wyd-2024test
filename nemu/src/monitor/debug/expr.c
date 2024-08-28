@@ -5,12 +5,18 @@
  */
 #include <sys/types.h>
 #include <regex.h>
-
+// https://www.runoob.com/regexp/regexp-syntax.html zhengze yvfa
 enum {
-	NOTYPE = 256, EQ
-
+	NOTYPE = 256,
+	NUM = 1,
+	RESGISTER = 2,
+	HEX = 3,
+	EQ = 4,
+	NOTEQ = 5,
+	OR = 6,
+	AND = 7,
+	POINT, NEG
 	/* TODO: Add more token types */
-
 };
 
 static struct rule {
@@ -23,8 +29,25 @@ static struct rule {
 	 */
 
 	{" +",	NOTYPE},				// spaces
+	
 	{"\\+", '+'},					// plus
-	{"==", EQ}						// equal
+	{"\\-", '-'},
+	{"\\*", '*'},
+	{"\\/", '/'},
+
+	{"\\$[a-z]+", RESGISTER},
+	{"0[xX][0-9a-fA-F]+", HEX},
+	{"[0-9]+", NUM},
+	
+	{"==", EQ},						// equal
+	{"!=", NOTEQ},
+	
+	{"\\(", '('},
+	{"\\)", ')'},
+	
+	{"\\|\\|", OR},
+	{"&&", AND},
+	{"!", '!'},
 };
 
 #define NR_REGEX (sizeof(rules) / sizeof(rules[0]) )
@@ -62,7 +85,7 @@ static bool make_token(char *e) {
 	regmatch_t pmatch;
 	
 	nr_token = 0;
-
+	
 	while(e[position] != '\0') {
 		/* Try all rules one by one. */
 		for(i = 0; i < NR_REGEX; i ++) {
@@ -78,7 +101,76 @@ static bool make_token(char *e) {
 				 * of tokens, some extra actions should be performed.
 				 */
 
+				int j;
+				for (j = 0; j < 32; j++){ //Çå¿Õ
+					tokens[nr_token].str[j] = '\0';
+				}
 				switch(rules[i].token_type) {
+					case 256:
+						break;
+					case 1:
+						tokens[nr_token].type = 1;
+						strncpy(tokens[nr_token].str, &e[position - substr_len], substr_len);
+						nr_token++;
+						break;
+					case 2:
+						tokens[nr_token].type = 2;
+						strncpy(tokens[nr_token].str, &e[position - substr_len], substr_len);
+						nr_token++;
+						break;
+					case 3:
+						tokens[nr_token].type = 3;
+						strncpy(tokens[nr_token].str, &e[position - substr_len], substr_len);
+						nr_token++;
+						break;
+					case 4:
+						tokens[nr_token].type = 4;
+						strcpy(tokens[nr_token].str, "==");
+						nr_token++;
+						break;
+					case 5:
+						tokens[nr_token].type = 5;
+						strcpy(tokens[nr_token].str, "!=");
+						nr_token++;
+						break;
+					case 6:
+						tokens[nr_token].type = 6;
+						strcpy(tokens[nr_token].str, "||");
+						nr_token++;
+						break;
+					case 7:
+						tokens[nr_token].type = 7;
+						strcpy(tokens[nr_token].str, "&&");
+						nr_token++;
+						break;
+					case '+':
+						tokens[nr_token].type = '+';
+						nr_token++;
+						break;
+					case '-':
+						tokens[nr_token].type = '-';
+						nr_token++;
+						break;
+					case '*':
+						tokens[nr_token].type = '*';
+						nr_token++;
+						break;
+					case '/':
+						tokens[nr_token].type = '/';
+						nr_token++;
+						break;
+					case '!':
+						tokens[nr_token].type = '!';
+						nr_token++;
+						break;
+					case '(':
+						tokens[nr_token].type = '(';
+						nr_token++;
+						break;
+					case ')':
+						tokens[nr_token].type = ')';
+						nr_token++;
+						break;
 					default: panic("please implement me");
 				}
 
