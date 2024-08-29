@@ -255,7 +255,13 @@ int dominant_operator(int p, int q){
 					op = i;
 					pri = 47;
 				}
+			} else if (tokens[i].type == '!'){
+				if (pri < 46){
+					op = i;
+					pri = 46;
+				}
 			}
+
 			else if (step < 0){
 				return -2;
 			}
