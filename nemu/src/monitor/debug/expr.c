@@ -18,7 +18,7 @@ enum {
 	POINT, NEG
 	/* TODO: Add more token types */
 
-};
+};//这里的hash值同时也包含了运算优先级
 
 static struct rule {
 	char *regex;
@@ -266,11 +266,11 @@ int dominant_operator(int p, int q){
 //编写eval()函数，该函数用于表达式求值。
 //当op == -1的时候，如果token的类型是NEG，则取出表达式并且放在result，最后返回-result即可
 //这个函数实现了带有负数的求值以及更复杂的运算
-uint32_t eval(int p, int q){
+uint32_t eval(int p, int q){ //两两字符进行处理
 	int result = 0;
 	int op=0;
 	int val1, val2;
-	if (p > q){
+	if (p > q){//非法
 		assert(0);
 	} else if (p == q){
 		if (tokens[p].type == NUM){
@@ -352,11 +352,11 @@ uint32_t eval(int p, int q){
 			}
 		
 		
-		else if (tokens[p].type == '!'){
-			sscanf(tokens[q].str, "%d", &result);
-			return !result;
-		} 
-		else if (tokens[p].type == RESGISTER) {
+			else if (tokens[p].type == '!'){
+				sscanf(tokens[q].str, "%d", &result);
+				return !result;
+			} 
+			else if (tokens[p].type == RESGISTER) {
 				if (!strcmp(tokens[p].str, "$eax")){
 					result = cpu.eax;
 					return result;
