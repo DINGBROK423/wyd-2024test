@@ -276,10 +276,7 @@ uint32_t eval(int p, int q){ //两两字符进行处理
 		if (tokens[p].type == NUM){
 			sscanf(tokens[p].str, "%d", &result);
 			return result;
-		} else if (tokens[p].type == '!'){
-				sscanf(tokens[q].str, "%d", &result);
-				return !result;
-	 	} else if (tokens[p].type == HEX){
+		} else if (tokens[p].type == HEX){
 			int i = 2;
 			while(tokens[p].str[i] != 0){
 				result *= 16;
@@ -311,14 +308,20 @@ uint32_t eval(int p, int q){ //两两字符进行处理
 		} else {
 			assert(0);
 		}
-	 } 	else if (check_parentheses(p, q) == true){
-	 		return eval(p + 1, q - 1);
-	 }	else {
-			op = dominant_operator(p, q);
-			if (op == -2){
-				assert(0);
-			}
-			else if (op == -1){
+	 } 	
+	 else if (tokens[p].type == '!'){
+		sscanf(tokens[q].str, "%d", &result);
+		return !result;
+	 }
+	 else if (check_parentheses(p, q) == true){
+	 	return eval(p + 1, q - 1);
+	 }	   
+	 else {
+		op = dominant_operator(p, q);
+	 	if (op == -2){
+			assert(0);
+		}
+		else if (op == -1){
 			//负数处理
 			 if (tokens[p].type == NEG){
 				sscanf(tokens[q].str, "%d", &result);
