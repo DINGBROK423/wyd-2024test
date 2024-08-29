@@ -8,10 +8,16 @@ typedef struct watchpoint {
 	struct watchpoint *next;
 
 	/* TODO: Add more members if necessary */
-	//增加结构体的成员
-	char expr[100];
-	int result;
+        char *expr;
+	uint32_t new_val;
+	uint32_t old_val;
 
 } WP;
+
+/* Add some fuctions for watchpoint */
+int set_watchpoint(char *e);
+bool delete_watchpoint(int NO);
+void list_watchpoint();
+WP* scan_watchpoint();
 
 #endif

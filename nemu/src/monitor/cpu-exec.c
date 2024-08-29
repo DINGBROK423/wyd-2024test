@@ -1,4 +1,5 @@
 #include "monitor/monitor.h"
+#include "monitor/watchpoint.h"
 #include "cpu/helper.h"
 #include <setjmp.h>
 //#include "debug/watchpoint.c"//别include源文件
@@ -9,8 +10,6 @@
  * You can modify this value as you want.
  */
 #define MAX_INSTR_TO_PRINT 10
-extern bool checkWP();//调用一下，要不会报错
-extern void printf_wp();//调用一下，要不会报错
 
 int nemu_state = STOP;
 
@@ -76,14 +75,18 @@ void cpu_exec(volatile uint32_t n) {
 #endif
 
 		/* TODO: check watchpoints here. */
-		//checkWP()返回值用来判断是否触发监视点，如果触发了就更改nemu_state的状态。
-		bool change = checkWP();
-		if (change){
-			nemu_state = STOP;
+            WP *wp = scan_watchpoint();
+		if(wp != NULL) {
+			puts(asm_buf);
+			printf("\n\nHint watchpoint %d at address 0x%08x, expr = %s\n", wp->NO, cpu.eip - instr_len, wp->expr);
+			printf("old value = %#08x\nnew value = %#08x\n", wp->old_val, wp->new_val);
+			wp->old_val = wp->new_val;
+			return;
 		}
-		else {
-			printf_wp();
-		}
+
+		if(nemu_state != RUNNING) { return; }
+		
+
 
 
 #ifdef HAS_DEVICE
