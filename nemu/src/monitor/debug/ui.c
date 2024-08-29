@@ -2,10 +2,14 @@
 #include "monitor/expr.h"
 #include "monitor/watchpoint.h"
 #include "nemu.h"
-
+// #include "watchpoint.c"
 #include <stdlib.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+extern void free_wp(WP *wp);
+extern bool checkWP();
+extern void printf_wp();
+extern WP* delete_wp(int p, bool *key);
 void cpu_exec(uint32_t);
 
 /* We use the `readline' library to provide more flexibility to read from stdin. */
@@ -65,6 +69,11 @@ static int cmd_info(char *args){
 		printf("eip\t\t0x%08x\t\t%d\n", cpu.eip, cpu.eip);
 	return 0;
 	}
+	//如果分隔后的第一个字符是w就打印监视点的功能。这里貌似不能定义另一个函数来打印监视点，和之前的会有冲突，所以直接在cmd_info添加判断。
+	if (strcmp(sencondWord, "w") == 0){
+		printf_wp();
+		return 0;
+	}
 	printf("MISINPUT\n");
 	return 0;
 }
@@ -102,6 +111,23 @@ static int cmd_p(char *args){
 	}
 	return 0;
 }
+//添加删除指令。
+static int cmd_d(char *args){
+	int p;
+	bool key = true;
+	sscanf(args, "%d", &p);
+	WP* q = delete_wp(p, &key);
+	if (key){
+		printf("Delete watchpoint %d: %s\n", q->NO, q->expr);
+		free_wp(q);
+		return 0;
+	} else {
+		printf("No found watchpoint %d\n", p);
+		return 0;
+	}
+	return 0;
+}
+
 static struct {
 	char *name;
 	char *description;
@@ -113,7 +139,9 @@ static struct {
 	{ "si", "One step", cmd_si },
 	{ "info", "Display all informations of regisiters", cmd_info },
 	{ "x", "Scan Memory", cmd_x },
-	{ "p", "Evaluation of expression",cmd_p},
+	{ "p", "Evaluation of expression", cmd_p},
+	{ "w", "Set breakpoint", cmd_info},
+	{ "d", "Delete breakpoint", cmd_d}
 	/* TODO: Add more commands */
 
 };

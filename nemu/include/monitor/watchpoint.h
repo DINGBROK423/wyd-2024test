@@ -8,7 +8,9 @@ typedef struct watchpoint {
 	struct watchpoint *next;
 
 	/* TODO: Add more members if necessary */
-
+	//增加结构体的成员
+	char expr[100];
+	int result;
 
 } WP;
 

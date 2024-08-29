@@ -1,6 +1,7 @@
 #include "monitor/monitor.h"
 #include "cpu/helper.h"
 #include <setjmp.h>
+//#include "debug/watchpoint.c"//别include源文件
 
 /* The assembly code of instructions executed is only output to the screen
  * when the number of instructions executed is less than this value.
@@ -8,6 +9,7 @@
  * You can modify this value as you want.
  */
 #define MAX_INSTR_TO_PRINT 10
+extern bool checkWP();//调用一下，要不会报错
 
 int nemu_state = STOP;
 
@@ -73,6 +75,11 @@ void cpu_exec(volatile uint32_t n) {
 #endif
 
 		/* TODO: check watchpoints here. */
+		//checkWP()返回值用来判断是否触发监视点，如果触发了就更改nemu_state的状态。
+		bool change = checkWP();
+		if (change){
+			nemu_state = STOP;
+		}
 
 
 #ifdef HAS_DEVICE
