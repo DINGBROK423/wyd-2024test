@@ -10,6 +10,7 @@
  */
 #define MAX_INSTR_TO_PRINT 10
 extern bool checkWP();//调用一下，要不会报错
+extern void printf_wp();//调用一下，要不会报错
 
 int nemu_state = STOP;
 
@@ -79,6 +80,9 @@ void cpu_exec(volatile uint32_t n) {
 		bool change = checkWP();
 		if (change){
 			nemu_state = STOP;
+		}
+		else {
+			printf_wp();
 		}
 
 
