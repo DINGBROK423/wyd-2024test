@@ -315,10 +315,6 @@ uint32_t eval(int p, int q){ //两两字符进行处理
 			assert(0);
 		}
 	 } 	
-	 else if (tokens[p].type == '!'){
-		sscanf(tokens[q].str, "%d", &result);
-		return !result;
-	 }
 	 else if (check_parentheses(p, q) == true){
 	 	return eval(p + 1, q - 1);
 	 }	   
@@ -327,13 +323,17 @@ uint32_t eval(int p, int q){ //两两字符进行处理
 	 	if (op == -2){
 			assert(0);
 		}
+		else if (tokens[p].type == '!'){
+			sscanf(tokens[q].str, "%d", &result);
+			return !result;
+		}
 		else if (op == -1){
 			//负数处理
 			 if (tokens[p].type == NEG){
 				sscanf(tokens[q].str, "%d", &result);
 				return -result;
 			}
-			
+		}
 			//指针类型解引用
 			if(tokens[p].type == POINT){
 				if (!strcmp(tokens[p + 2].str, "$eax")){
@@ -398,7 +398,7 @@ uint32_t eval(int p, int q){ //两两字符进行处理
 					return 0;
 				}
 			}
-		}
+		
 		val1 = eval(p, op - 1);
 		val2 = eval(op + 1, q);
 
