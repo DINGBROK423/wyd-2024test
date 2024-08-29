@@ -251,9 +251,9 @@ int dominant_operator(int p, int q){
 					pri = 48;
 				}
 			} else if (tokens[i].type == '*' || tokens[i].type == '/'){
-				if (pri < 46){
+				if (pri < 47){
 					op = i;
-					pri = 46;
+					pri = 47;
 				}
 			}
 			else if (step < 0){
