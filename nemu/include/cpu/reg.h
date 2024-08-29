@@ -30,7 +30,7 @@ typedef struct {
     };
 
 
-     swaddr_t eip;
+     swaddr_t eip;//这还有一个寄存器，在expr.c中写指针解引用的时候别忘了
      
      union {
 		struct {

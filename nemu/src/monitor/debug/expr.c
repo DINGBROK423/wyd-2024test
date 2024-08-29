@@ -60,7 +60,7 @@ static regex_t re[NR_REGEX];
  * Therefore we compile them only once before any usage.
  */
 void init_regex() {
-	int i;
+	int i;//byd自己写的时候才发现int i不能定义在for循环的括号里面
 	char error_msg[128];
 	int ret;
 
@@ -316,10 +316,12 @@ uint32_t eval(int p, int q){ //两两字符进行处理
 			assert(0);
 		}
 		else if (op == -1){
+			//负数处理
 			 if (tokens[p].type == NEG){
 				sscanf(tokens[q].str, "%d", &result);
 				return -result;
 			} 
+			//指针类型解引用
 			if(tokens[p].type == POINT){
 				if (!strcmp(tokens[p + 2].str, "$eax")){
 					result = swaddr_read(cpu.eax, 4);
