@@ -310,7 +310,12 @@ uint32_t eval(int p, int q){ //两两字符进行处理
 		}
 	 } else if (check_parentheses(p, q) == true){
 	 	return eval(p + 1, q - 1);
-	 } else {
+	 }
+	 else if (tokens[p].type == '!'){
+				sscanf(tokens[q].str, "%d", &result);
+				return !result;
+	}   
+	 else {
 		op = dominant_operator(p, q);
 	 	if (op == -2){
 			assert(0);
@@ -321,10 +326,7 @@ uint32_t eval(int p, int q){ //两两字符进行处理
 				sscanf(tokens[q].str, "%d", &result);
 				return -result;
 			}
-			else if (tokens[p].type == '!'){
-				sscanf(tokens[q].str, "%d", &result);
-				return !result;
-			}  
+			
 			//指针类型解引用
 			if(tokens[p].type == POINT){
 				if (!strcmp(tokens[p + 2].str, "$eax")){
