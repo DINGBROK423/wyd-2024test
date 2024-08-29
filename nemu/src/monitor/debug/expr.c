@@ -88,7 +88,7 @@ static bool make_token(char *e) {
 	
 	nr_token = 0;//指示已经被识别出的 token 数目。
 
-	while(e[position] != '\0') {
+	while(e[position] != '\0') {  //char数组没到结尾
 		/* Try all rules one by one. */
 		for(i = 0; i < NR_REGEX; i ++) {
 			if(regexec(&re[i], e + position, 1, &pmatch, 0) == 0 && pmatch.rm_so == 0) {
@@ -97,7 +97,7 @@ static bool make_token(char *e) {
 
 				Log("match rules[%d] = \"%s\" at position %d with len %d: %.*s", i, rules[i].regex, position, substr_len, substr_len, substr_start);
 				position += substr_len;
-
+				
 				/* TODO: Now a new token is recognized with rules[i]. Add codes
 				 * to record the token in the array `tokens'. For certain types
 				 * of tokens, some extra actions should be performed.
@@ -230,36 +230,36 @@ int dominant_operator(int p, int q){
 		}
 	
 		if (step == 0){
-		if (tokens[i].type == OR){
-			if (pri < 51){
-				op = i;
-				pri = 51;
+			if (tokens[i].type == OR){
+				if (pri < 51){
+					op = i;
+					pri = 51;
+				}
+			} else if (tokens[i].type == AND){
+				if (pri < 50){
+					op = i;
+					pri = 50;
+				}
+			} else if (tokens[i].type == EQ || tokens[i].type == NOTEQ){
+				if (pri < 49){
+					op = i;
+					pri = 49;
+				}
+			} else if (tokens[i].type == '+' || tokens[i].type == '-'){
+				if (pri < 48){
+					op = i;
+					pri = 48;
+				}
+			} else if (tokens[i].type == '*' || tokens[i].type == '/'){
+				if (pri < 46){
+					op = i;
+					pri = 46;
+				}
 			}
-		} else if (tokens[i].type == AND){
-			if (pri < 50){
-				op = i;
-				pri = 50;
-			}
-		} else if (tokens[i].type == EQ || tokens[i].type == NOTEQ){
-			if (pri < 49){
-				op = i;
-				pri = 49;
-			}
-		} else if (tokens[i].type == '+' || tokens[i].type == '-'){
-			if (pri < 48){
-				op = i;
-				pri = 48;
-			}
-		} else if (tokens[i].type == '*' || tokens[i].type == '/'){
-			if (pri < 46){
-				op = i;
-				pri = 46;
+			else if (step < 0){
+				return -2;
 			}
 		}
-		else if (step < 0){
-			return -2;
-		}
-	}
 	}
 	return op;
 }
@@ -350,12 +350,13 @@ uint32_t eval(int p, int q){
 					return result;
 				}
 			}
-		}
+		
 		
 		else if (tokens[p].type == '!'){
-				sscanf(tokens[q].str, "%d", &result);
-				return !result;
-			} else if (tokens[p].type == RESGISTER) {
+			sscanf(tokens[q].str, "%d", &result);
+			return !result;
+		} 
+		else if (tokens[p].type == RESGISTER) {
 				if (!strcmp(tokens[p].str, "$eax")){
 					result = cpu.eax;
 					return result;
@@ -413,9 +414,10 @@ uint32_t eval(int p, int q){
 				    }
 			default : assert(0);
 		}
-	 
+	 }
 	return 0;
 }
+//判断token属于POINT还是NEG，只要token前一个运算符不是十进制、十六进制以及左括号就把token解释为POINT和NEG。
 uint32_t expr(char *e, bool *success) {
     if(!make_token(e)) {
 		*success = false;
