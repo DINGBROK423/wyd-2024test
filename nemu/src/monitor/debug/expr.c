@@ -328,44 +328,46 @@ uint32_t eval(int p, int q){ //两两字符进行处理
 			sscanf(tokens[q].str, "%d", &result);
 			return !result;
 		}
-	//	else if (op == -1){
-			//负数处理
+		else if (op == -1){
+			//指针类型解引用
+			if(tokens[p].type == POINT){
+				if (!strcmp(tokens[p + 2].str, "$eax")){
+					result = swaddr_read(cpu.eax, 4);
+					return result;
+				} else if (!strcmp(tokens[p + 2].str, "$ecx")){
+					result = swaddr_read(cpu.ecx, 4);
+					return result;
+				} else if (!strcmp(tokens[p + 2].str, "$edx")){
+					result = swaddr_read(cpu.edx, 4);
+					return result;
+				} else if (!strcmp(tokens[p + 2].str, "$ebx")){
+					result = swaddr_read(cpu.ebx, 4);
+					return result;
+				} else if (!strcmp(tokens[p + 2].str, "$esp")){
+					result = swaddr_read(cpu.esp, 4);
+					return result;
+				} else if (!strcmp(tokens[p + 2].str, "$ebp")){
+					result = swaddr_read(cpu.ebp, 4);
+					return result;
+				} else if (!strcmp(tokens[p + 2].str, "$esi")){
+					result = swaddr_read(cpu.esi, 4);
+					return result;
+				} else if (!strcmp(tokens[p + 2].str, "$edi")){
+					result = swaddr_read(cpu.edi, 4);
+					return result;
+				} else if (!strcmp(tokens[p + 2].str, "$eip")){
+					result = swaddr_read(cpu.eip, 4);
+					return result;
+				}
+			}
+		}
+		//负数处理
 		else if (tokens[p].type == NEG){
 			sscanf(tokens[q].str, "%d", &result);
 			return -result;
 		}
 	//	}
-		//指针类型解引用
-		if(tokens[p].type == POINT){
-			if (!strcmp(tokens[p + 2].str, "$eax")){
-				result = swaddr_read(cpu.eax, 4);
-				return result;
-			} else if (!strcmp(tokens[p + 2].str, "$ecx")){
-				result = swaddr_read(cpu.ecx, 4);
-				return result;
-			} else if (!strcmp(tokens[p + 2].str, "$edx")){
-				result = swaddr_read(cpu.edx, 4);
-				return result;
-			} else if (!strcmp(tokens[p + 2].str, "$ebx")){
-				result = swaddr_read(cpu.ebx, 4);
-				return result;
-			} else if (!strcmp(tokens[p + 2].str, "$esp")){
-				result = swaddr_read(cpu.esp, 4);
-				return result;
-			} else if (!strcmp(tokens[p + 2].str, "$ebp")){
-				result = swaddr_read(cpu.ebp, 4);
-				return result;
-			} else if (!strcmp(tokens[p + 2].str, "$esi")){
-				result = swaddr_read(cpu.esi, 4);
-				return result;
-			} else if (!strcmp(tokens[p + 2].str, "$edi")){
-				result = swaddr_read(cpu.edi, 4);
-				return result;
-			} else if (!strcmp(tokens[p + 2].str, "$eip")){
-				result = swaddr_read(cpu.eip, 4);
-				return result;
-			}
-		}
+		
 		else if (tokens[p].type == RESGISTER) {
 			if (!strcmp(tokens[p].str, "$eax")){
 				result = cpu.eax;
