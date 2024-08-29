@@ -390,7 +390,6 @@ uint32_t eval(int p, int q){
 				}
 			}
 		}
-		}
 		val1 = eval(p, op - 1);
 		val2 = eval(op + 1, q);
 
@@ -415,7 +414,7 @@ uint32_t eval(int p, int q){
 				    }
 			default : assert(0);
 		}
-	 
+	 }
 	return 0;
 }
 //判断token属于POINT还是NEG，只要token前一个运算符不是十进制、十六进制以及左括号就把token解释为POINT和NEG。
