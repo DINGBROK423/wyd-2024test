@@ -314,7 +314,45 @@ uint32_t eval(int p, int q){
 		op = dominant_operator(p, q);
 	 	if (op == -2){
 			assert(0);
-		} else if (tokens[p].type == '!'){
+		}
+		else if (op == -1){
+			 if (tokens[p].type == NEG){
+				sscanf(tokens[q].str, "%d", &result);
+				return -result;
+			} 
+			if(tokens[p].type == POINT){
+				if (!strcmp(tokens[p + 2].str, "$eax")){
+					result = swaddr_read(cpu.eax, 4);
+					return result;
+				} else if (!strcmp(tokens[p + 2].str, "$ecx")){
+					result = swaddr_read(cpu.ecx, 4);
+					return result;
+				} else if (!strcmp(tokens[p + 2].str, "$edx")){
+					result = swaddr_read(cpu.edx, 4);
+					return result;
+				} else if (!strcmp(tokens[p + 2].str, "$ebx")){
+					result = swaddr_read(cpu.ebx, 4);
+					return result;
+				} else if (!strcmp(tokens[p + 2].str, "$esp")){
+					result = swaddr_read(cpu.esp, 4);
+					return result;
+				} else if (!strcmp(tokens[p + 2].str, "$ebp")){
+					result = swaddr_read(cpu.ebp, 4);
+					return result;
+				} else if (!strcmp(tokens[p + 2].str, "$esi")){
+					result = swaddr_read(cpu.esi, 4);
+					return result;
+				} else if (!strcmp(tokens[p + 2].str, "$edi")){
+					result = swaddr_read(cpu.edi, 4);
+					return result;
+				} else if (!strcmp(tokens[p + 2].str, "$eip")){
+					result = swaddr_read(cpu.eip, 4);
+					return result;
+				}
+			}
+		}
+		
+		else if (tokens[p].type == '!'){
 				sscanf(tokens[q].str, "%d", &result);
 				return !result;
 			} else if (tokens[p].type == RESGISTER) {
