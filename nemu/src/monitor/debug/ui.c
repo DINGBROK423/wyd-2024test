@@ -111,6 +111,16 @@ static int cmd_p(char *args){
 	}
 	return 0;
 }
+static int cmd_w(char *args){
+	char *sencondWord = strtok(NULL," ");
+	//如果分隔后的第一个字符是w就打印监视点的功能。这里貌似不能定义另一个函数来打印监视点，和之前的会有冲突，所以直接在cmd_info添加判断。
+	if (strcmp(sencondWord, "w") == 0){
+		printf_wp();
+		return 0;
+	}
+	printf("MISINPUT\n");
+	return 0;
+}
 //添加删除指令。
 static int cmd_d(char *args){
 	int p;
@@ -140,7 +150,7 @@ static struct {
 	{ "info", "Display all informations of regisiters", cmd_info },
 	{ "x", "Scan Memory", cmd_x },
 	{ "p", "Evaluation of expression", cmd_p},
-	{ "w", "Set breakpoint", cmd_info},
+	{ "w", "Set breakpoint", cmd_w},
 	{ "d", "Delete breakpoint", cmd_d}
 	/* TODO: Add more commands */
 
