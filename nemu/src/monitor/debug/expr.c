@@ -282,7 +282,7 @@ uint32_t eval(int p, int q){ //两两字符进行处理
 				result *= 16;
 				result += tokens[p].str[i] < 58 ? tokens[p].str[i] - '0' : tokens[p].str[i] - 'a' + 10;
 				i++;
-		}
+			}
 		} else if (tokens[p].type == RESGISTER){
 			if (!strcmp(tokens[p].str, "$eax")){
 					return cpu.eax;
@@ -320,7 +320,11 @@ uint32_t eval(int p, int q){ //两两字符进行处理
 			 if (tokens[p].type == NEG){
 				sscanf(tokens[q].str, "%d", &result);
 				return -result;
-			} 
+			}
+			else if (tokens[p].type == '!'){
+				sscanf(tokens[q].str, "%d", &result);
+				return !result;
+			}  
 			//指针类型解引用
 			if(tokens[p].type == POINT){
 				if (!strcmp(tokens[p + 2].str, "$eax")){
@@ -352,12 +356,6 @@ uint32_t eval(int p, int q){ //两两字符进行处理
 					return result;
 				}
 			}
-		
-		
-			else if (tokens[p].type == '!'){
-				sscanf(tokens[q].str, "%d", &result);
-				return !result;
-			} 
 			else if (tokens[p].type == RESGISTER) {
 				if (!strcmp(tokens[p].str, "$eax")){
 					result = cpu.eax;
