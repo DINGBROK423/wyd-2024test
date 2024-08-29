@@ -1,9 +1,9 @@
 #include "monitor/watchpoint.h"
 #include "monitor/expr.h"
 #include "cpu/reg.h"
-
 #define NR_WP 32
-
+//extern struct sg_header;
+//int result;
 static WP wp_pool[NR_WP];
 static WP *head, *free_;
 //extern  CPU_state cpu; //调用对象
