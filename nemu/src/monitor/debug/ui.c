@@ -78,57 +78,57 @@ static int cmd_info(char *args) {
 
 /* Add examine memory */
 //É¨ÃèÄÚ´æ
-// static int cmd_x(char *args) {
-// 	char *arg = strtok(NULL, " ");
-// 	int n,i;
-// 	swaddr_t addr;
-// 	if(arg != NULL) {
-// 		sscanf(arg, "%d", &n);
-// 		bool success;
-// 		addr = expr(arg + strlen(arg) + 1, &success);
-// 		if(success) { 
-// 			for(i = 0; i < n; i ++) {
-// 				if(i % 4 == 0) {
-// 					printf("0x%08x: ", addr);
-// 				}
+static int cmd_x(char *args) {
+	char *arg = strtok(NULL, " ");
+	int n,i;
+	swaddr_t addr;
+	if(arg != NULL) {
+		sscanf(arg, "%d", &n);
+		bool success;
+		addr = expr(arg + strlen(arg) + 1, &success);
+		if(success) { 
+			for(i = 0; i < n; i ++) {
+				if(i % 4 == 0) {
+					printf("0x%08x: ", addr);
+				}
 
-// 				printf("0x%08x ", swaddr_read(addr, 4));
-// 				addr += 4;
-// 				if(i % 4 == 3) {
-// 					printf("\n");
-// 				}
-// 			}
-// 			printf("\n");
-// 		}
-// 		else  printf("Bad expression\n"); 
-// 	}
-// 	return 0;
-// }
-static int cmd_x(char *args){
-	char *sencondWord = strtok(NULL," ");
-	char *thirdWord = strtok(NULL, " ");
-	
-	int step = 0;
-	swaddr_t address;
-	
-	sscanf(sencondWord, "%d", &step);
-	sscanf(thirdWord, "%x", &address);
-
-	int i, j = 0;
-	for (i = 0; i < step; i++){
-		if (j % 4 == 0){
-			printf("0x%x:", address);
-		}
-		printf("0x%08x ", swaddr_read(address, 4));
-		address += 4;
-		j++;
-		if (j % 4 == 0){
+				printf("0x%08x ", swaddr_read(addr, 4));
+				addr += 4;
+				if(i % 4 == 3) {
+					printf("\n");
+				}
+			}
 			printf("\n");
 		}
-			}
-	printf("\n");
+		else  printf("Bad expression\n"); 
+	}
 	return 0;
 }
+// static int cmd_x(char *args){
+// 	char *sencondWord = strtok(NULL," ");
+// 	char *thirdWord = strtok(NULL, " ");
+	
+// 	int step = 0;
+// 	swaddr_t address;
+	
+// 	sscanf(sencondWord, "%d", &step);
+// 	sscanf(thirdWord, "%x", &address);
+
+// 	int i, j = 0;
+// 	for (i = 0; i < step; i++){
+// 		if (j % 4 == 0){
+// 			printf("0x%x:", address);
+// 		}
+// 		printf("0x%08x ", swaddr_read(address, 4));
+// 		address += 4;
+// 		j++;
+// 		if (j % 4 == 0){
+// 			printf("\n");
+// 		}
+// 			}
+// 	printf("\n");
+// 	return 0;
+// }
 
 /* Add expression evaluation  */
 static int cmd_p(char *args) {

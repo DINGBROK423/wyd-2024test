@@ -8,11 +8,12 @@
 #include <stdlib.h>
 
 enum {
-	NOTYPE = 256, EQ
-
 	/* TODO: Add more token types */
-        , NUM, NEQ, OR, AND, REG, REF, NEG
-};
+	NOTYPE = 256, EQ, NUM, NEQ, OR, AND, REG, REF, NEG
+};   
+//枚举类型，hash值从256开始，防止与ascll码冲突。
+//同时隐式表示了各个运算符运算顺序
+//REG:寄存器 REF解引用 NEG 否定 
 
 static struct rule {
 	char *regex;
@@ -22,12 +23,12 @@ static struct rule {
 	/* TODO: Add more rules.
 	 * Pay attention to the precedence level of different rules.
 	 */
-
+	//定义规则：正则表达式语法
 	{" +",	NOTYPE},				// spaces
 	{"\\+", '+'},					// plus
 	{"==", EQ},						// equal
-	{"0x[0-9a-fA-F]{1,8}", NUM},			// hex
-	{"[0-9]{1,10}", NUM},					// dec
+	{"0x[0-9a-fA-F]{1,8}", NUM},			// hex（十六进制）
+	{"[0-9]{1,10}", NUM},					// dec（十进制）
 	{"\\$[a-z]{1,31}", REG},				// register names 
 	{"-", '-'},
 	{"\\*", '*'},
@@ -52,7 +53,7 @@ void init_regex() {
 	int i;
 	char error_msg[128];
 	int ret;
-
+	//regcomp： 编译数组规则中的每个 regex 错误处理： 如果 regex 编译失败，程序会生成错误信息，并断言
 	for(i = 0; i < NR_REGEX; i ++) {
 		ret = regcomp(&re[i], rules[i].regex, REG_EXTENDED);
 		if(ret != 0) {
@@ -65,16 +66,18 @@ void init_regex() {
 typedef struct token {
 	int type;
 	char str[32];
-} Token;
+} Token; //结构体储存token
 
 Token tokens[32];
 int nr_token;
-
+//make_token:该函数遍历 regex 规则列表，并使用 .regexec 逐一应用这些规则 
+//Token Creation： 如果找到匹配，则将相应的标记存储到数组
+//tokens substr_len 和 substr_start： 确定匹配子串的长度和起始位置： 将匹配的子字符串复制到令牌的字符串字段，用于令牌类型和 
+//NUMREG 错误处理： 如果未找到匹配字符串，函数将返回 false
 static bool make_token(char *e) {
 	int position = 0;
 	int i;
 	regmatch_t pmatch;
-	
 	nr_token = 0;
 
 	while(e[position] != '\0') {
@@ -86,12 +89,10 @@ static bool make_token(char *e) {
 
 				Log("match rules[%d] = \"%s\" at position %d with len %d: %.*s", i, rules[i].regex, position, substr_len, substr_len, substr_start);
 				position += substr_len;
-
 				/* TODO: Now a new token is recognized with rules[i]. Add codes
 				 * to record the token in the array `tokens'. For certain types
 				 * of tokens, some extra actions should be performed.
 				 */
-
 				switch(rules[i].token_type) {
                                         case NOTYPE: break;
                                         case NUM:
@@ -100,7 +101,6 @@ static bool make_token(char *e) {
 					default: tokens[nr_token].type = rules[i].token_type;
 							 nr_token ++;
 				}
-
 				break;
 			}
 		}
@@ -110,12 +110,11 @@ static bool make_token(char *e) {
 			return false;
 		}
 	}
-
 	return true; 
 }
 
 /*TODO: Expression evaluation*/
-
+//op_prec 功能： 返回运算符的优先级。 数字越小优先级越高
 static int op_prec(int t) {
 	switch(t) {
 		case '!': case NEG: case REF: return 0;
@@ -131,7 +130,8 @@ static int op_prec(int t) {
 static inline int op_prec_cmp(int t1, int t2) {
 	return op_prec(t1) - op_prec(t2);
 }
-
+//find_dominated_op 函数： 查找给定范围内优先级最低的运算符（占优运算符）。 
+//括号处理： 该函数通过跟踪 .bracket_level 主导运算符，正确处理括号内的表达式： 该函数返回表达式中优先级最低的运算符的索引。
 static int find_dominated_op(int s, int e, bool *success) {
 	int i;
 	int bracket_level = 0;
@@ -147,7 +147,7 @@ static int find_dominated_op(int s, int e, bool *success) {
 			case ')': 
 				bracket_level --; 
 				if(bracket_level < 0) {
-					*success = false;
+					*success = false; //括号数量不符
 					return 0;
 				}
 				break;
