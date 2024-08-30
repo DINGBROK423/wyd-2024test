@@ -46,11 +46,11 @@ void reg_test() {
 //寄存器相关
 void display_reg() {
 	int i;
-	for(i = 0; i < 8; i ++) {
+	for(i = 0; i < 8; i ++) {//循环八次，对应八个寄存器
 		printf("%s\t\t0x%08x\t\t%d\n", regsl[i], cpu.gpr[i]._32, cpu.gpr[i]._32);
-	}
+	}//打印寄存器的值，其中%08x：将数字格式化为 8 位十六进制数，并用前导零填充。
 
-	printf("%s\t\t0x%08x\t\t%d\n", "eip", cpu.eip, cpu.eip);
+	printf("%s\t\t0x%08x\t\t%d\n", "eip", cpu.eip, cpu.eip);//别忘了eip
 }
 
 /* TODO: Get the value of register */

@@ -30,15 +30,34 @@ char* rl_gets() {
 
 /* TODO: Add single step */
 //这里我选择改宏来实现执行10条以上for循环的操作
-static int cmd_si(char *args) {
-	char *arg = strtok(NULL, " ");
-	int i = 1;
-	if(arg != NULL) {
-		sscanf(arg, "%d", &i);
+// static int cmd_si(char *args) {
+// 	char *arg = strtok(NULL, " ");
+// 	int i = 1;
+// 	if(arg != NULL) {
+// 		sscanf(arg, "%d", &i);
+// 	}
+// 	cpu_exec(i);
+// 	return 0;
+// }
+static int cmd_si(char *args){
+	char *sencondWord = strtok(NULL," ");
+	int step = 0;
+	int i;
+	if (sencondWord == NULL){//空char数组
+		cpu_exec(1);
+		return 0;	
 	}
-	cpu_exec(i);
+	sscanf(sencondWord, "%d", &step);
+	if (step <= 0){
+		printf("MISINIPUT\n");
+		return 0;
+	}
+	for (i = 0; i < step; i++){
+		cpu_exec(1);
+	}
 	return 0;
 }
+
 
 /* TODO: Add info command */
 static int cmd_info(char *args) {
@@ -58,15 +77,13 @@ static int cmd_info(char *args) {
 }
 
 /* Add examine memory */
+//扫描内存
 static int cmd_x(char *args) {
 	char *arg = strtok(NULL, " ");
-	int n;
+	int n,i;
 	swaddr_t addr;
-	int i;
-
 	if(arg != NULL) {
 		sscanf(arg, "%d", &n);
-
 		bool success;
 		addr = expr(arg + strlen(arg) + 1, &success);
 		if(success) { 
@@ -83,8 +100,7 @@ static int cmd_x(char *args) {
 			}
 			printf("\n");
 		}
-		else { printf("Bad expression\n"); }
-
+		else  printf("Bad expression\n"); 
 	}
 	return 0;
 }
