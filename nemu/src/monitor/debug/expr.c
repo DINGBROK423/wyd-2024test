@@ -171,7 +171,10 @@ static int find_dominated_op(int s, int e, bool *success) {
 }
 
 uint32_t get_reg_val(const char*, bool *);
-
+//eval 函数： 对表达式进行递归求值 
+//基本情况：如果表达式是单个标记(REG,NUM),函数将返回其值.
+// 如果表达式位于括号内，函数将对内部表达式进行求值。 
+//递归求值： 该函数查找主导运算符，并递归计算其两侧的子表达式，根据运算符合并结果。
 static uint32_t eval(int s, int e, bool *success) {
 	if(s > e) {
 		// bad expression
@@ -194,9 +197,9 @@ static uint32_t eval(int s, int e, bool *success) {
 		*success = true;
 		return val;
 	}
-	else if(tokens[s].type == '(' && tokens[e].type == ')') {
+	else if(tokens[s].type == '(' && tokens[e].type == ')') {//左右括号匹配
 		return eval(s + 1, e - 1, success);
-	}
+	}  
 	else {
 		int dominated_op = find_dominated_op(s, e, success);
 		if(!*success) { return 0; }
@@ -240,7 +243,7 @@ uint32_t expr(char *e, bool *success) {
 	if(!make_token(e)) {
 		*success = false;
 		return 0;
-	}
+	}//预处理
 
 	/* TODO: Insert codes to evaluate the expression. */
        	//panic("please implement me");
@@ -248,6 +251,8 @@ uint32_t expr(char *e, bool *success) {
         /* Detect REF and NEG tokens */
 	int i;
 	int prev_type;
+	//NEG：如果前面没有有效操作数（数字、寄存器或结束括号），则将减号标识为否定运算符
+	// REF： 如果前面没有有效操作数，则将星号标识为解引用运算符。
 	for(i = 0; i < nr_token; i ++) {
 		if(tokens[i].type == '-') {
 			if(i == 0) {
@@ -274,6 +279,6 @@ uint32_t expr(char *e, bool *success) {
 		}
 	}
 
-	return eval(0, nr_token - 1, success);
+	return eval(0, nr_token - 1, success);//递归，nr_token减1，然后进入下一层
 }
 
