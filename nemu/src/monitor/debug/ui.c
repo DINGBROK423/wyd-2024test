@@ -177,11 +177,10 @@ static struct {
 	char *name;
 	char *description;
 	int (*handler) (char *);
-} cmd_table [] = {
+} cmd_table [] = {//≤π≥‰√¸¡Ó
 	{ "help", "Display informations about all supported commands", cmd_help },
 	{ "c", "Continue the execution of the program", cmd_c },
 	{ "q", "Exit NEMU", cmd_q }, 
-
 	/* TODO: Add more commands */
     { "si", "Single step", cmd_si },
     { "info", "info r - print register values; info w - show watch point state", cmd_info },//¥Ú”°
@@ -198,7 +197,6 @@ static int cmd_help(char *args) {
 	/* extract the first argument */
 	char *arg = strtok(NULL, " ");
 	int i;
-
 	if(arg == NULL) {
 		/* no argument given */
 		for(i = 0; i < NR_CMD; i ++) {
@@ -216,16 +214,13 @@ static int cmd_help(char *args) {
 	}
 	return 0;
 }
-
 void ui_mainloop() {
 	while(1) {
 		char *str = rl_gets();
 		char *str_end = str + strlen(str);
-
 		/* extract the first token as the command */
 		char *cmd = strtok(str, " ");
 		if(cmd == NULL) { continue; }
-
 		/* treat the remaining string as the arguments,
 		 * which may need further parsing
 		 */
