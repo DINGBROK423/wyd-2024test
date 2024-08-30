@@ -29,25 +29,37 @@ char* rl_gets() {
 }
 
 /* TODO: Add single step */
-static int cmd_si(char *args) {
-	char *arg = strtok(NULL, " ");
-	int i = 1;
-
-	if(arg != NULL) {
-		sscanf(arg, "%d", &i);
+//这里我选择改宏来实现执行10条以上for循环的操作
+static int cmd_si(char *args){
+	char *sencondWord = strtok(NULL," ");
+	int step = 0;
+	int i;
+	if (sencondWord == NULL){//空char数组
+		cpu_exec(1);
+		return 0;	
 	}
-	cpu_exec(i);
+	sscanf(sencondWord, "%d", &step);
+	if (step <= 0){
+		printf("MISINIPUT\n");
+		return 0;
+	}
+	for (i = 0; i < step; i++){
+		cpu_exec(1);
+	}
 	return 0;
 }
+
 
 /* TODO: Add info command */
 static int cmd_info(char *args) {
 	char *arg = strtok(NULL, " ");
 
 	if(arg != NULL) {
+		//打印寄存器
 		if(strcmp(arg, "r") == 0) {
 			display_reg();
 		}
+		//打印断点信息
 		else if(strcmp(arg, "w") == 0) {
 			list_watchpoint();
 		}
@@ -90,7 +102,6 @@ static int cmd_x(char *args) {
 /* Add expression evaluation  */
 static int cmd_p(char *args) {
 	bool success;
-
 	if(args) {
 		uint32_t r = expr(args, &success);
 		if(success) { printf("0x%08x(%d)\n", r, r); }
@@ -142,11 +153,11 @@ static struct {
 
 	/* TODO: Add more commands */
     { "si", "Single step", cmd_si },
-    { "info", "info r - print register values; info w - show watch point state", cmd_info },
-	{ "x", "Examine memory", cmd_x },
-    { "p", "Evaluate the value of expression", cmd_p },
-	{ "w", "Set watchpoint", cmd_w },
-	{ "d", "Delete watchpoint", cmd_d }
+    { "info", "info r - print register values; info w - show watch point state", cmd_info },//打印
+	{ "x", "Examine memory", cmd_x },//扫描内存
+    { "p", "Evaluate the expression", cmd_p },//表达式求值
+	{ "w", "Set watchpoint", cmd_w },//打上断点
+	{ "d", "Delete watchpoint", cmd_d }//删除断点
 
 };
 

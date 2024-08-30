@@ -43,6 +43,7 @@ void reg_test() {
 }
 
 /*TODO: Show register files*/
+//¼Ä´æÆ÷Ïà¹Ø
 void display_reg() {
 	int i;
 	for(i = 0; i < 8; i ++) {

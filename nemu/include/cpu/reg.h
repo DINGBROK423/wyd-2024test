@@ -26,7 +26,7 @@ typedef struct {
 
         struct {
             uint32_t eax, ecx, edx, ebx, esp, ebp, esi, edi;
-        };
+        };//这里利用结构体的特点把八个寄存器内存位置固定下来，与上面联合体形成映射，同时寄存器之间彼此不会互相影响
     };
 
 

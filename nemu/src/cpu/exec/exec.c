@@ -92,7 +92,7 @@ make_group(group7,
 
 
 /* TODO: Add more instructions!!! */
-
+// 函数指针数组
 helper_fun opcode_table [256] = {
 /* 0x00 */	inv, inv, inv, inv,
 /* 0x04 */	inv, inv, inv, inv,
