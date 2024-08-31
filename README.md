@@ -1,3 +1,8 @@
+# 仓库分支
+### master 主分支
+### p1 pa1阶段任务分支
+### p2 pa2阶段任务分支
+### p3 pa3阶段任务分支
 # ICS2021 Programming Assignment
 
 This project is the programming assignment of the class ICS(Introduction to Computer System) in College of Intelligence and Computing, Tianjin Univerisity.
