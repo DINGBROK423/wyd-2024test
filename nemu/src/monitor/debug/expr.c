@@ -5,20 +5,15 @@
  */
 #include <sys/types.h>
 #include <regex.h>
-// https://www.runoob.com/regexp/regexp-syntax.html zhengze yvfa
-enum {
-	NOTYPE = 256,
-	NUM = 1,
-	RESGISTER = 2,
-	HEX = 3,
-	EQ = 4,
-	NOTEQ = 5,
-	OR = 6,
-	AND = 7,
-	POINT, NEG
-	/* TODO: Add more token types */
+#include <stdlib.h>
 
-};//这里的hash值同时也包含了运算优先级
+enum {
+	/* TODO: Add more token types */
+	NOTYPE = 256, EQ, NUM, NEQ, OR, AND, REG, REF, NEG
+};   
+//枚举类型，hash值从256开始，防止与ascll码冲突。
+//同时隐式表示了各个运算符运算顺序
+//REG:寄存器 REF解引用 NEG 否定 
 
 static struct rule {
 	char *regex;
@@ -28,29 +23,24 @@ static struct rule {
 	/* TODO: Add more rules.
 	 * Pay attention to the precedence level of different rules.
 	 */
-
+	//定义规则：正则表达式语法
 	{" +",	NOTYPE},				// spaces
-	
 	{"\\+", '+'},					// plus
-	{"\\-", '-'},
-	{"\\*", '*'},
-	{"\\/", '/'},
-
-	{"\\$[a-z]+", RESGISTER},
-	{"0[xX][0-9a-fA-F]+", HEX},
-	{"[0-9]+", NUM},
-	
 	{"==", EQ},						// equal
-	{"!=", NOTEQ},
-	
-	{"\\(", '('},
-	{"\\)", ')'},
-	
-	{"\\|\\|", OR},
+	{"0x[0-9a-fA-F]{1,8}", NUM},			// hex（十六进制）
+	{"[0-9]{1,10}", NUM},					// dec（十进制）
+	{"\\$[a-z]{1,31}", REG},				// register names 
+	{"-", '-'},
+	{"\\*", '*'},
+	{"/", '/'},
+	{"%", '%'},
+	{"!=", NEQ},
 	{"&&", AND},
+	{"\\|\\|", OR},
 	{"!", '!'},
+	{"\\(", '('},
+	{"\\)", ')'} 
 };
-
 
 #define NR_REGEX (sizeof(rules) / sizeof(rules[0]) )
 
@@ -63,7 +53,7 @@ void init_regex() {
 	int i;
 	char error_msg[128];
 	int ret;
-
+	//regcomp： 编译数组规则中的每个 regex 错误处理： 如果 regex 编译失败，程序会生成错误信息，并断言
 	for(i = 0; i < NR_REGEX; i ++) {
 		ret = regcomp(&re[i], rules[i].regex, REG_EXTENDED);
 		if(ret != 0) {
@@ -76,19 +66,21 @@ void init_regex() {
 typedef struct token {
 	int type;
 	char str[32];
-} Token;//使用 Token 结构体来记录 token 的信息
+} Token; //结构体储存token
 
 Token tokens[32];
 int nr_token;
-
+//make_token:该函数遍历 regex 规则列表，并使用 .regexec 逐一应用这些规则 
+//Token Creation： 如果找到匹配，则将相应的标记存储到数组
+//tokens substr_len 和 substr_start： 确定匹配子串的长度和起始位置： 将匹配的子字符串复制到令牌的字符串字段，用于令牌类型和 
+//NUMREG 错误处理： 如果未找到匹配字符串，函数将返回 false
 static bool make_token(char *e) {
 	int position = 0;
 	int i;
 	regmatch_t pmatch;
-	
-	nr_token = 0;//指示已经被识别出的 token 数目。
+	nr_token = 0;
 
-	while(e[position] != '\0') {  //char数组没到结尾
+	while(e[position] != '\0') {
 		/* Try all rules one by one. */
 		for(i = 0; i < NR_REGEX; i ++) {
 			if(regexec(&re[i], e + position, 1, &pmatch, 0) == 0 && pmatch.rm_so == 0) {
@@ -97,87 +89,18 @@ static bool make_token(char *e) {
 
 				Log("match rules[%d] = \"%s\" at position %d with len %d: %.*s", i, rules[i].regex, position, substr_len, substr_len, substr_start);
 				position += substr_len;
-				
 				/* TODO: Now a new token is recognized with rules[i]. Add codes
 				 * to record the token in the array `tokens'. For certain types
 				 * of tokens, some extra actions should be performed.
 				 */
-
-				int j;
-				for (j = 0; j < 32; j++){ //清空
-					tokens[nr_token].str[j] = '\0';
-				}
-				
 				switch(rules[i].token_type) {
-					case 256:
-						break;
-					case 1:
-						tokens[nr_token].type = 1;
-						strncpy(tokens[nr_token].str, &e[position - substr_len], substr_len);
-						nr_token++;
-						break;
-					case 2:
-						tokens[nr_token].type = 2;
-						strncpy(tokens[nr_token].str, &e[position - substr_len], substr_len);
-						nr_token++;
-						break;
-					case 3:
-						tokens[nr_token].type = 3;
-						strncpy(tokens[nr_token].str, &e[position - substr_len], substr_len);
-						nr_token++;
-						break;
-					case 4:
-						tokens[nr_token].type = 4;
-						strcpy(tokens[nr_token].str, "==");
-						nr_token++;
-						break;
-					case 5:
-						tokens[nr_token].type = 5;
-						strcpy(tokens[nr_token].str, "!=");
-						nr_token++;
-						break;
-					case 6:
-						tokens[nr_token].type = 6;
-						strcpy(tokens[nr_token].str, "||");
-						nr_token++;
-						break;
-					case 7:
-						tokens[nr_token].type = 7;
-						strcpy(tokens[nr_token].str, "&&");
-						nr_token++;
-						break;
-					case '+':
-						tokens[nr_token].type = '+';
-						nr_token++;
-						break;
-					case '-':
-						tokens[nr_token].type = '-';
-						nr_token++;
-						break;
-					case '*':
-						tokens[nr_token].type = '*';
-						nr_token++;
-						break;
-					case '/':
-						tokens[nr_token].type = '/';
-						nr_token++;
-						break;
-					case '!':
-						tokens[nr_token].type = '!';
-						nr_token++;
-						break;
-					case '(':
-						tokens[nr_token].type = '(';
-						nr_token++;
-						break;
-					case ')':
-						tokens[nr_token].type = ')';
-						nr_token++;
-						break;
-					default: 
-						assert(0);
+                                        case NOTYPE: break;
+                                        case NUM:
+					//default: panic("please implement me");
+                                        case REG: sprintf(tokens[nr_token].str, "%.*s", substr_len, substr_start);
+					default: tokens[nr_token].type = rules[i].token_type;
+							 nr_token ++;
 				}
-
 				break;
 			}
 		}
@@ -187,252 +110,175 @@ static bool make_token(char *e) {
 			return false;
 		}
 	}
-
 	return true; 
 }
-//该函数是用来识别表达式中的左括号和右括号是否匹配
-bool check_parentheses(int p, int q){
-	int a;
-	int j = 0, k = 0;
-	if (tokens[p].type == '(' || tokens[q].type == ')'){
-		for (a = p; a <= q; a++){
-			if (tokens[a].type == '('){
-				j++;
-			}
-			if (tokens[a].type == ')'){
-				k++;
-			}
-			if (a != q && j == k){
-				return false;
-			}
-		}
-		if (j == k){
-				return true;
-			} else {
-				return false;
-			}
-	}
-	return false;
-}
-//该函数是用于区分运算符的优先级。首先判断表达式中括号数量是否正确
-int dominant_operator(int p, int q){
-	int step = 0;
-	int i;
-	int op = -1;
-	int pri = 0;
-    
-	for (i = p; i <= q; i++){
-		if (tokens[i].type == '('){
-			step++;
-		}
-		if (tokens[i].type == ')'){
-			step--;
-		}
-	
-		if (step == 0){
-			if (tokens[i].type == OR){
-				if (pri < 51){
-					op = i;
-					pri = 51;
-				}
-			} else if (tokens[i].type == AND){
-				if (pri < 50){
-					op = i;
-					pri = 50;
-				}
-			} else if (tokens[i].type == EQ || tokens[i].type == NOTEQ){
-				if (pri < 49){
-					op = i;
-					pri = 49;
-				}
-			} else if (tokens[i].type == '+' || tokens[i].type == '-'){
-				if (pri < 48){
-					op = i;
-					pri = 48;
-				}
-			} else if (tokens[i].type == '*' || tokens[i].type == '/'){
-				if (pri < 46){
-					op = i;
-					pri = 46;
-				}
-			}
-			else if (step < 0){
-				return -2;
-			}
-		}
-	}
-	return op;
-}
-//编写eval()函数，该函数用于表达式求值。
-//当op == -1的时候，如果token的类型是NEG，则取出表达式并且放在result，最后返回-result即可
-//这个函数实现了带有负数的求值以及更复杂的运算
-uint32_t eval(int p, int q){ //两两字符进行处理
-	int result = 0;
-	int op=0;
-	int val1, val2;
-	if (p > q){//非法
-		assert(0);
-	} else if (p == q){
-		if (tokens[p].type == NUM){
-			sscanf(tokens[p].str, "%d", &result);
-			return result;
-		} else if (tokens[p].type == HEX){
-			int i = 2;
-			while(tokens[p].str[i] != 0){
-				result *= 16;
-				result += tokens[p].str[i] < 58 ? tokens[p].str[i] - '0' : tokens[p].str[i] - 'a' + 10;
-				i++;
-		}
-		} else if (tokens[p].type == RESGISTER){
-			if (!strcmp(tokens[p].str, "$eax")){
-					return cpu.eax;
-				} else if (!strcmp(tokens[p].str, "$ecx")){
-					return cpu.ecx;
-				} else if (!strcmp(tokens[p].str, "$edx")){
-					return cpu.edx;
-				} else if (!strcmp(tokens[p].str, "$ebx")){
-					return cpu.ebx;
-				} else if (!strcmp(tokens[p].str, "$esp")){
-					return cpu.esp;
-				} else if (!strcmp(tokens[p].str, "$ebp")){
-					return cpu.ebp;
-				} else if (!strcmp(tokens[p].str, "$esi")){
-					return cpu.esi;
-				} else if (!strcmp(tokens[p].str, "$edi")){
-					return cpu.edi;
-				} else if (!strcmp(tokens[p].str, "$eip")){
-					return cpu.eip;
-				} else {
-					return 0;
-				}
-		} else {
-			assert(0);
-		}
-	 } else if (check_parentheses(p, q) == true){
-	 	return eval(p + 1, q - 1);
-	 } else {
-		op = dominant_operator(p, q);
-	 	if (op == -2){
-			assert(0);
-		}
-		else if (op == -1){
-			 if (tokens[p].type == NEG){
-				sscanf(tokens[q].str, "%d", &result);
-				return -result;
-			} 
-			if(tokens[p].type == POINT){
-				if (!strcmp(tokens[p + 2].str, "$eax")){
-					result = swaddr_read(cpu.eax, 4);
-					return result;
-				} else if (!strcmp(tokens[p + 2].str, "$ecx")){
-					result = swaddr_read(cpu.ecx, 4);
-					return result;
-				} else if (!strcmp(tokens[p + 2].str, "$edx")){
-					result = swaddr_read(cpu.edx, 4);
-					return result;
-				} else if (!strcmp(tokens[p + 2].str, "$ebx")){
-					result = swaddr_read(cpu.ebx, 4);
-					return result;
-				} else if (!strcmp(tokens[p + 2].str, "$esp")){
-					result = swaddr_read(cpu.esp, 4);
-					return result;
-				} else if (!strcmp(tokens[p + 2].str, "$ebp")){
-					result = swaddr_read(cpu.ebp, 4);
-					return result;
-				} else if (!strcmp(tokens[p + 2].str, "$esi")){
-					result = swaddr_read(cpu.esi, 4);
-					return result;
-				} else if (!strcmp(tokens[p + 2].str, "$edi")){
-					result = swaddr_read(cpu.edi, 4);
-					return result;
-				} else if (!strcmp(tokens[p + 2].str, "$eip")){
-					result = swaddr_read(cpu.eip, 4);
-					return result;
-				}
-			}
-		
-		
-			else if (tokens[p].type == '!'){
-				sscanf(tokens[q].str, "%d", &result);
-				return !result;
-			} 
-			else if (tokens[p].type == RESGISTER) {
-				if (!strcmp(tokens[p].str, "$eax")){
-					result = cpu.eax;
-					return result;
-				} else if (!strcmp(tokens[p].str, "$ecx")){
-					result = cpu.ecx;
-					return result;
-				} else if (!strcmp(tokens[p].str, "$edx")){
-					result = cpu.edx;
-					return result;
-				} else if (!strcmp(tokens[p].str, "$ebx")){
-					result = cpu.ebx;
-					return result;
-				} else if (!strcmp(tokens[p].str, "$esp")){
-					result = cpu.esp;
-					return result;
-				} else if (!strcmp(tokens[p].str, "$ebp")){
-					result = cpu.ebp;
-					return result;
-				} else if (!strcmp(tokens[p].str, "$esi")){
-					result = cpu.esi;
-					return result;
-				} else if (!strcmp(tokens[p].str, "$edi")){
-					result = cpu.edi;
-					return result;
-				} else if (!strcmp(tokens[p].str, "$eip")){
-					result = cpu.eip;
-					return result;
-				} else {
-					assert(0);
-					return 0;
-				}
-			}
-		}
-		val1 = eval(p, op - 1);
-		val2 = eval(op + 1, q);
 
-		switch (tokens[op].type){
-			case '+' : return val1 + val2;	
-			case '-' : return val1 - val2;
-			case '*' : return val1 * val2;
-			case '/' : return val1 / val2;
-			case OR : return val1 || val2;
-			case AND : return val1 && val2;
-			case EQ : 
-				   if (val1 == val2){
-					return 1;
-				   } else {
-					return 0;
-				   }
-			case NOTEQ :
-				   if (val1 != val2){
-					return 1;
-				    } else {
-					return 0;
-				    }
-			default : assert(0);
-		}
-	 }
-	return 0;
+/*TODO: Expression evaluation*/
+//op_prec 功能： 返回运算符的优先级。 数字越小优先级越高
+static int op_prec(int t) {
+	switch(t) {
+		case '!': case NEG: case REF: return 0;
+		case '*': case '/': case '%': return 1;
+		case '+': case '-': return 2;
+		case EQ: case NEQ: return 4;
+		case AND: return 8;
+		case OR: return 9;
+		default: assert(0);
+	}
 }
-//判断token属于POINT还是NEG，只要token前一个运算符不是十进制、十六进制以及左括号就把token解释为POINT和NEG。
-uint32_t expr(char *e, bool *success) {
-    if(!make_token(e)) {
+
+static inline int op_prec_cmp(int t1, int t2) {
+	return op_prec(t1) - op_prec(t2);
+}
+//find_dominated_op 函数： 查找给定范围内优先级最低的运算符（占优运算符）。 
+//括号处理： 该函数通过跟踪 .bracket_level 主导运算符，正确处理括号内的表达式： 该函数返回表达式中优先级最低的运算符的索引。
+static int find_dominated_op(int s, int e, bool *success) {
+	int i;
+	int bracket_level = 0;
+	int dominated_op = -1;
+	for(i = s; i <= e; i ++) {
+		switch(tokens[i].type) {
+			case REG: case NUM: break;
+
+			case '(': 
+				bracket_level ++; 
+				break;
+
+			case ')': 
+				bracket_level --; 
+				if(bracket_level < 0) {
+					*success = false; //括号数量不符
+					return 0;
+				}
+				break;
+
+			default:
+				if(bracket_level == 0) {
+					if(dominated_op == -1 || 
+							op_prec_cmp(tokens[dominated_op].type, tokens[i].type) < 0 ||
+							(op_prec_cmp(tokens[dominated_op].type, tokens[i].type) == 0 && 
+							 tokens[i].type != '!' && tokens[i].type != '~' &&
+							 tokens[i].type != NEG && tokens[i].type != REF) ) {
+						dominated_op = i;
+					}
+				}
+				break;
+		}
+	}
+
+	*success = (dominated_op != -1);
+	return dominated_op;
+}
+
+uint32_t get_reg_val(const char*, bool *);
+//eval 函数： 对表达式进行递归求值 
+//基本情况：如果表达式是单个标记(REG,NUM),函数将返回其值.
+// 如果表达式位于括号内，函数将对内部表达式进行求值。 
+//递归求值： 该函数查找主导运算符，并递归计算其两侧的子表达式，根据运算符合并结果。
+static uint32_t eval(int s, int e, bool *success) {
+	if(s > e) {
+		// bad expression
 		*success = false;
 		return 0;
 	}
-	int i;
-	for (i = 0; i < nr_token; i++){
-		if (tokens[i].type == '*' && (i == 0 || (tokens[i - 1].type != NUM && tokens[i - 1].type != HEX && tokens[i - 1].type != ')'))){
-			tokens[i].type = POINT;
+	else if(s == e) {
+		// single token
+		uint32_t val;
+		switch(tokens[s].type) {
+			case REG: val = get_reg_val(tokens[s].str + 1, success);	// +1 to skip '$'
+					  if(!*success) { return 0; }
+					  break;
+
+			case NUM: val = strtol(tokens[s].str, NULL, 0); break;
+
+			default: assert(0);
 		}
-		if (tokens[i].type == '-' && (i == 0 || (tokens[i - 1].type != NUM && tokens[i - 1].type != HEX && tokens[i - 1].type != ')'))){
-			tokens[i].type = NEG;
+
+		*success = true;
+		return val;
+	}
+	else if(tokens[s].type == '(' && tokens[e].type == ')') {//左右括号匹配
+		return eval(s + 1, e - 1, success);
+	}  
+	else {
+		int dominated_op = find_dominated_op(s, e, success);
+		if(!*success) { return 0; }
+
+		int op_type = tokens[dominated_op].type;
+		if(op_type == '!' || op_type == NEG || op_type == REF) {
+			uint32_t val = eval(dominated_op + 1, e, success);
+			if(!*success) { return 0; }
+
+			switch(op_type) {
+				case '!': return !val;
+				case NEG: return -val;
+				case REF: return swaddr_read(val, 4);
+				default: assert(0);
+			}
+		}
+
+		uint32_t val1 = eval(s, dominated_op - 1, success);
+		if(!*success) { return 0; }
+		uint32_t val2 = eval(dominated_op + 1, e, success);
+		if(!*success) { return 0; }
+
+		switch(op_type) {
+			case '+': return val1 + val2;
+			case '-': return val1 - val2;
+			case '*': return val1 * val2;
+			case '/': return val1 / val2;
+			case '%': return val1 % val2;
+			case EQ: return val1 == val2;
+			case NEQ: return val1 != val2;
+			case AND: return val1 && val2;
+			case OR: return val1 || val2;
+			default: assert(0);
 		}
 	}
-	return eval(0, nr_token - 1);
 }
 
+/* TODO: Expression evaluation end */
+
+uint32_t expr(char *e, bool *success) {
+	if(!make_token(e)) {
+		*success = false;
+		return 0;
+	}//预处理
+
+	/* TODO: Insert codes to evaluate the expression. */
+       	//panic("please implement me");
+	//return 0;
+        /* Detect REF and NEG tokens */
+	int i;
+	int prev_type;
+	//NEG：如果前面没有有效操作数（数字、寄存器或结束括号），则将减号标识为否定运算符
+	// REF： 如果前面没有有效操作数，则将星号标识为解引用运算符。
+	for(i = 0; i < nr_token; i ++) {
+		if(tokens[i].type == '-') {
+			if(i == 0) {
+				tokens[i].type = NEG;
+				continue;
+			}
+
+			prev_type = tokens[i - 1].type;
+			if( !(prev_type == ')' || prev_type == NUM || prev_type == REG) ) {
+				tokens[i].type = NEG;
+			}
+		}
+
+		else if(tokens[i].type == '*') {
+			if(i == 0) {
+				tokens[i].type = REF;
+				continue;
+			}
+
+			prev_type = tokens[i - 1].type;
+			if( !(prev_type == ')' || prev_type == NUM || prev_type == REG) ) {
+				tokens[i].type = REF;
+			}
+		}
+	}
+
+	return eval(0, nr_token - 1, success);//递归，nr_token减1，然后进入下一层
+}
 

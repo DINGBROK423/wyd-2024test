@@ -20,17 +20,17 @@ typedef struct {
             uint32_t _32;
             uint16_t _16;
             uint8_t _8[2];
-        } gpr[8];
+        } gpr[8];//改写成联合体
 
         /* Do NOT change the order of the GPRs' definitions. */
 
         struct {
             uint32_t eax, ecx, edx, ebx, esp, ebp, esi, edi;
-        };
+        };//这里利用结构体的特点把八个寄存器内存位置固定下来，与上面联合体形成映射，同时寄存器之间彼此不会互相影响
     };
 
 
-     swaddr_t eip;
+     swaddr_t eip;//这还有一个寄存器，在expr.c中写指针解引用的时候别忘了
      
      union {
 		struct {

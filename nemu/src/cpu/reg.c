@@ -42,3 +42,44 @@ void reg_test() {
 	assert(eip_sample == cpu.eip);
 }
 
+/*TODO: Show register files*/
+//寄存器相关
+void display_reg() {
+	int i;
+	for(i = 0; i < 8; i ++) {//循环八次，对应八个寄存器
+		printf("%s\t\t0x%08x\t\t%d\n", regsl[i], cpu.gpr[i]._32, cpu.gpr[i]._32);
+	}//打印寄存器的值，其中%08x：将数字格式化为 8 位十六进制数，并用前导零填充。
+
+	printf("%s\t\t0x%08x\t\t%d\n", "eip", cpu.eip, cpu.eip);//别忘了eip
+}
+
+/* TODO: Get the value of register */
+uint32_t get_reg_val(const char *s, bool *success) {
+	int i;
+	*success = true;
+	for(i = 0; i < 8; i ++) {
+		if(strcmp(regsl[i], s) == 0) {
+			return reg_l(i);
+		}
+	}
+
+	for(i = 0; i < 8; i ++) {
+		if(strcmp(regsw[i], s) == 0) {
+			return reg_w(i);
+		}
+	}
+
+	for(i = 0; i < 8; i ++) {
+		if(strcmp(regsb[i], s) == 0) {
+			return reg_b(i);
+		}
+	}
+
+	if(strcmp("eip", s) == 0) {
+		return cpu.eip;
+	}
+
+	*success = false;
+	return 0;
+}
+
