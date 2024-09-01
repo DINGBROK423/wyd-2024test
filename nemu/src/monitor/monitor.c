@@ -19,7 +19,7 @@ static void init_log() {
 }
 
 static void welcome() {
-	printf("Welcome to NEMU!(你说的对，但是《崩坏：星穹铁道》是由米哈游自主研发的一款全新回合制游戏。游戏发生在一个「星神」所创造的宇宙，在这里，他们创造现实磨削星辰，在无数【世界】留下他们痕迹，在这里，你将扮演一位名为特殊的旅客，将与继承【开拓】意识的伙伴们，和他们一起沿着某个【星神】曾经所行之旅前进，乘坐星空列车穿越银河，在无数光怪陆离【世界】与【世界】之间展开新的冒险探索新的文明同时逐步发掘「星神秘密」的真相。)\nThe executable is %s.\nFor help, type \"help\"\n",
+	printf("Welcome to NEMU!\n(You're right, but Honkai: Star Rail is a new turn-based game developed by miHoYo. The game takes place in a universe created by the [Star God], where they create reality to grind the stars and leave their mark on countless [worlds], where you will play as a special traveler who will follow the journey of a certain [Star God] with his companions who have inherited the consciousness of [Star God], ride the starry sky train through the galaxy, and embark on new adventures between countless strange [worlds] to explore new civilizations while gradually uncovering the truth of [Star God's Secrets].)\nThe executable is %s.\nFor help, type \"help\"\n",
 			exec_file);
 }
 
