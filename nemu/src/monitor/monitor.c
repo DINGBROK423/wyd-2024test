@@ -20,7 +20,7 @@ static void init_log() {
 
 static void welcome() {
 	 printf("\033[32mWelcome to NEMU!\033[0m\n"  
-           "\033(You're right, but Honkai: Star Rail is a new turn-based game developed by miHoYo. The game takes place in a universe created by the [Star God], where they create reality to grind the stars and leave their mark on countless [worlds], where you will play as a special traveler who will follow the journey of a certain [Star God] with his companions who have inherited the consciousness of [Star God], ride the starry sky train through the galaxy, and embark on new adventures between countless strange [worlds] to explore new civilizations while gradually uncovering the truth of [Star God's Secrets].)\033[0m\n"  
+           "\033[34m(You're right, but Honkai: Star Rail is a new turn-based game developed by miHoYo. The game takes place in a universe created by the [Star God], where they create reality to grind the stars and leave their mark on countless [worlds], where you will play as a special traveler who will follow the journey of a certain [Star God] with his companions who have inherited the consciousness of [Star God], ride the starry sky train through the galaxy, and embark on new adventures between countless strange [worlds] to explore new civilizations while gradually uncovering the truth of [Star God's Secrets].)\033[0m\n"  
            "\033[31mThe executable is %s.\033[0m\n"  
            "For help, type \"help\"\n",  
            exec_file);  
