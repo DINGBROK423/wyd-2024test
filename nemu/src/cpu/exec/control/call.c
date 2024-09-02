@@ -24,3 +24,5 @@ make_helper(call_rm) {
 
 	return len + 1;  //м╛ио
 }
+
+
