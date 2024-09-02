@@ -74,3 +74,7 @@ uint32_t loader() {
 
 	return entry;
 }
+/*首先需要正确定义ELF的Magic Word用来识别文件是否为ELF格式，
+这里用了框架代码中给出的函数ramdisk_read()用于读出ramdisk里的内容，然后把segment的代码正确加载。
+最后依照实验指导书中指示需要修改的部分后修改，即可完成此次任务，算是为PA3开一个头。
+ */
