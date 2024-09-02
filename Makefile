@@ -27,8 +27,8 @@ LIBC_INC_DIR := $(LIB_COMMON_DIR)/uclibc/include # 定义 uclibc 的头文件路径
 LIBC_LIB_DIR := $(LIB_COMMON_DIR)/uclibc/lib  # 定义 uclibc 的库文件路径
 LIBC := $(LIBC_LIB_DIR)/libc.a  # 定义 uclibc 的库文件
 
-#FLOAT := obj/$(LIB_COMMON_DIR)/FLOAT/FLOAT.a
-# 定义浮点运算库（目前被注释掉了）
+FLOAT := obj/$(LIB_COMMON_DIR)/FLOAT/FLOAT.a
+# 定义浮点运算库（启用）
 
 include config/Makefile.git
 include config/Makefile.build
@@ -74,7 +74,7 @@ clean: clean-cpp
 ##### some convinient rules #####
 
 -USERPROG := obj/testcase/mov  # 定义用户程序路径
-+USERPROG := obj/testcase/mov-c  #替换
++USERPROG := obj/testcase/quadratic-eq  #obj/testcase/mov-c  #替换
 -ENTRY := $(USERPROG)  # 将 ENTRY 定义为用户程序路径
 +ENTRY := $(kernel_BIN)  #替换
 entry: $(ENTRY)  # `entry` 目标：使用 `objcopy`
