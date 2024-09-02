@@ -1,14 +1,5 @@
-##### global settings #####
-
 .PHONY: nemu entry testcase kernel run gdb test submit clean count count_
 # .PHONY 声明伪目标，伪目标并不直接对应实际文件，而是表示一些任务或操作,此处我们在原有的基础上,添加count和count_命令
-
-# ---	Makefile
-# +++	Makefile
-# @@	-56,2	+56,2	@@
-# -USERPROG	=	obj/testcase/mov
-# +USERPROG	=	obj/testcase/mov-c
-# ENTRY	=	$(USERPROG)
 
 CC := gcc # 定义编译器为 gcc
 LD := ld  # 定义链接器为 ld
@@ -63,7 +54,7 @@ game: $(game_BIN)  # 定义构建 `game` 的规则，依赖于变量 `$(game_BIN)`
 clean-nemu:  # 删除 nemu 对应的构建输出目录
 	-rm -rf obj/nemu 2> /dev/null
 
-clean-testcase:  # 删除 nemu 对应的构建输出目录
+clean-testcase:  # 删除 testcase 对应的构建输出目录
 	-rm -rf obj/testcase 2> /dev/null
 
 clean-kernel:  # 删除 kernel 对应的构建输出目录
@@ -86,7 +77,7 @@ ENTRY := $(USERPROG)  # 将 ENTRY 定义为用户程序路径
 # ENTRY := $(kernel_BIN)
 
 entry: $(ENTRY)  # `entry` 目标：使用 `objcopy`
-	objcopy -S -O binary $(ENTRY) entry 
+	@objcopy -S -O binary $(ENTRY) entry 
 
 run: $(nemu_BIN) $(USERPROG) entry
 	$(call git_commit, "run")
