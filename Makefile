@@ -21,14 +21,20 @@ count_:
 	@find . -name '*.[ch]' | xargs grep -v '^\s*$$' | wc -l
 # count统计当前目录及其子目录中所有 `.c` 和 `.h` 文件的行数，包括空行
 # count_统计当前目录及其子目录中所有 `.c` 和 `.h` 文件的行数，不包括空行(使用 grep -v '^\s*$$' 过滤掉空行，然后使用 wc -l 统计剩余行数)
-
+ALL_CFLAGS := $(CFLAGS) -I$(LIBC_INC_DIR)  
 LIB_COMMON_DIR := lib-common  # 定义库的通用目录路径
-LIBC_INC_DIR := $(LIB_COMMON_DIR)/uclibc/include # 定义 uclibc 的头文件路径
+LIBC_INC_DIR := $(LIB_COMMON_DIR)/uclibc/include  # 定义 uclibc 的头文件路径
 LIBC_LIB_DIR := $(LIB_COMMON_DIR)/uclibc/lib  # 定义 uclibc 的库文件路径
 LIBC := $(LIBC_LIB_DIR)/libc.a  # 定义 uclibc 的库文件
 
 FLOAT := obj/$(LIB_COMMON_DIR)/FLOAT/FLOAT.a
 # 定义浮点运算库（启用）
+
+  
+# 然后使用这个新的变量来编译  
+# obj/testcase/%.o: src/testcase/%.c  
+#     $(CC) $(ALL_CFLAGS) -o $@ $<
+
 
 include config/Makefile.git
 include config/Makefile.build
@@ -67,16 +73,21 @@ clean-game:  # 删除 game 对应的构建输出目录
 
 clean: clean-cpp
 	-rm -rf obj 2> /dev/null
-	-rm -f *log.txt entry $(FLOAT) 2> /dev/null
+	-rm -f *log.txt entry $(FLOAT) $(USERPROG) 2> /dev/null
+#-rm -f *log.txt entry $(FLOAT) 2> /dev/null
 # `clean` 目标调用 `clean-cpp`（这个目标应该在包含的 Makefile 中定义），然后删除 obj 目录，
 # 删除日志文件和 entry 文件，以及浮点库（如果定义了 FLOAT）
 
 ##### some convinient rules #####
 
--USERPROG := obj/testcase/mov  # 定义用户程序路径
-+USERPROG := obj/testcase/quadratic-eq  #obj/testcase/mov-c  #替换
--ENTRY := $(USERPROG)  # 将 ENTRY 定义为用户程序路径
-+ENTRY := $(kernel_BIN)  #替换
+# -USERPROG := obj/testcase/mov  # 定义用户程序路径
+# +USERPROG := obj/testcase/quadratic-eq  #obj/testcase/mov-c  #替换
+# -ENTRY := $(USERPROG)  # 将 ENTRY 定义为用户程序路径
+# +ENTRY := $(kernel_BIN)  #替换
+USERPROG := obj/testcase/quadratic-eq
+#ENTRY := $(USERPROG)
+ENTRY := $(kernel_BIN)
+
 entry: $(ENTRY)  # `entry` 目标：使用 `objcopy`
 	objcopy -S -O binary $(ENTRY) entry 
 
