@@ -1,5 +1,6 @@
+#include "cpu/exec/helper.h"
 //模拟处理器指令执行中的“调用”（CALL）指令
-#include "include/cpu/exec/helper.h"
+
 
 //这个函数处理的是一种形式的CALL指令，其中目标地址是通过某种立即数（Immediate Value）或短立即数（Short Immediate）方式指定的。
 make_helper(call_si) {
@@ -20,7 +21,7 @@ make_helper(call_rm) {
 	swaddr_write(cpu.esp - 4, 4, ret_addr);  //同上
 	cpu.esp -= 4;  //同上
 	cpu.eip = op_src->val - (len + 1);  //这里的不同之处在于，目标地址不是直接给出的，而是存储在某个寄存器或内存地址中。因此，cpu.eip被设置为op_src->val - (len + 1)
-	print_asm("call *%s", op_src->str);
+	print_asm("c all *%s", op_src->str);
 
 	return len + 1;  //同上
 }
