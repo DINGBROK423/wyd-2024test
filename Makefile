@@ -12,7 +12,7 @@ CFLAGS := -MMD -Wall -Werror -c
 # -Wall: 启用所有警告
 # -Werror: 将警告视为错误（这个有的时候挺恶心的，但是有助于养成编程的好习惯）
 # -c: 只编译，不链接
-
+#testcase_LDFLAGS := -m elf_i386 -e main -Ttext-segment=0x00800000
 LIB_COMMON_DIR := lib-common
 # 定义库的通用目录路径
 
@@ -77,7 +77,8 @@ clean: clean-cpp
 
 USERPROG := obj/testcase/mov-c  
 # 定义用户程序路径
-ENTRY := $(USERPROG)  
+ENTRY := $(kernel_BIN)
+
 # 将 ENTRY 定义为用户程序路径
 entry: $(ENTRY)  
 # `entry` 目标：使用 `objcopy`
