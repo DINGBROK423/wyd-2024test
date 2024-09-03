@@ -5,8 +5,8 @@
 
 CC := gcc # 定义编译器为 gcc
 LD := ld  # 定义链接器为 ld
-CFLAGS := -MMD -Wall -Werror -c -I$(LIBC_INC_DIR)
-# CFLAGS := -MMD -Wall -Werror -c
+# CFLAGS := -MMD -Wall -Werror -c -I$(LIBC_INC_DIR)
+CFLAGS := -MMD -Wall -Werror -c
 # 编译选项：
 # -MMD: 生成依赖文件，用于自动管理文件依赖
 # -Wall: 启用所有警告

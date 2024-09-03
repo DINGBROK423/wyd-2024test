@@ -241,6 +241,7 @@ static int cmd_help(char *args) {
 	return 0;
 }
 void ui_mainloop() {
+	//exec(cpu.eip)加载一条指令并执行，返回的是这条指令的长度
 	while(1) {
 		char *str = rl_gets();
 		char *str_end = str + strlen(str);
@@ -250,7 +251,7 @@ void ui_mainloop() {
 		/* treat the remaining string as the arguments,
 		 * which may need further parsing
 		 */
-		char *args = cmd + strlen(cmd) + 1;
+		char *args = cmd + strlen(cmd) + 1; 
 		if(args >= str_end) {
 			args = NULL;
 		}
