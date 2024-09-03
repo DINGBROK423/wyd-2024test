@@ -28,7 +28,7 @@ LIBC_LIB_DIR := $(LIB_COMMON_DIR)/uclibc/lib
 LIBC := $(LIBC_LIB_DIR)/libc.a
 # 定义 uclibc 的库文件
 
-FLOAT := obj/$(LIB_COMMON_DIR)/FLOAT/FLOAT.a
+#FLOAT := obj/$(LIB_COMMON_DIR)/FLOAT/FLOAT.a
 #定义浮点运算库（目前被注释掉了）,在PA2必做任务3中去掉注释
 
 include config/Makefile.git
