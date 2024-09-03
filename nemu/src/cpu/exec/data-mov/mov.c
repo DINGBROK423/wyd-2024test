@@ -1,5 +1,5 @@
 #include "cpu/exec/helper.h"
-
+//同一模板，三种实现
 #define DATA_BYTE 1
 #include "mov-template.h"
 #undef DATA_BYTE
