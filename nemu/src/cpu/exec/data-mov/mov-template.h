@@ -1,13 +1,13 @@
 #include "cpu/exec/template-start.h"
 
-#define instr mov
+#define instr mov  //instr s是宏
 
-static void do_execute() {
-	OPERAND_W(op_dest, op_src->val);
-	print_asm_template2();
+static void do_execute() {  //读指 译码 写会
+	OPERAND_W(op_dest, op_src->val);  // 写入
+	print_asm_template2();  //打印
 }
 
-make_instr_helper(i2r)
+make_instr_helper(i2r)  // mov_i2r_l
 make_instr_helper(i2rm)
 make_instr_helper(r2rm)
 make_instr_helper(rm2r)

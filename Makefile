@@ -13,15 +13,6 @@ CFLAGS := -MMD -Wall -Werror -c
 # -Werror: 将警告视为错误（这个有的时候挺恶心的，但是有助于养成编程的好习惯）
 # -c: 只编译，不链接
 
-count:
-	@echo "Counting lines of code (including empty lines)..."
-	@find . -name '*.[ch]' | xargs wc -l
-
-count_:
-	@echo "Counting lines of code (excluding empty lines)..."
-	@find . -name '*.[ch]' | xargs grep -v '^\s*$$' | wc -l
-# count统计当前目录及其子目录中所有 `.c` 和 `.h` 文件的行数，包括空行
-# count_统计当前目录及其子目录中所有 `.c` 和 `.h` 文件的行数，不包括空行(使用 grep -v '^\s*$$' 过滤掉空行，然后使用 wc -l 统计剩余行数)
 
 LIB_COMMON_DIR := lib-common  # 定义库的通用目录路径
 LIBC_INC_DIR := $(LIB_COMMON_DIR)/uclibc/include # 定义 uclibc 的头文件路径
@@ -74,7 +65,7 @@ clean: clean-cpp
 
 ##### some convinient rules #####
 
-USERPROG := obj/testcase/mov-c  # 定义用户程序路径
+USERPROG := obj/testcase/add  # 定义用户程序路径
 # +USERPROG := obj/testcase/mov-c  #替换
 ENTRY := $(USERPROG)  # 将 ENTRY 定义为用户程序路径
 #+ENTRY := $(kernel_BIN)  #替换
@@ -95,6 +86,17 @@ test: $(nemu_BIN) $(testcase_BIN) entry
 
 submit: clean
 	cd .. && zip -r $(STU_ID).zip $(shell pwd | grep -o '[^/]*$$')
+
+count:
+	@echo "Counting lines of code (including empty lines)..."
+	@find . -name '*.[ch]' | xargs wc -l
+
+count_:
+	@echo "Counting lines of code (excluding empty lines)..."
+	@find . -name '*.[ch]' | xargs grep -v '^\s*$$' | wc -l
+# count统计当前目录及其子目录中所有 `.c` 和 `.h` 文件的行数，包括空行
+# count_统计当前目录及其子目录中所有 `.c` 和 `.h` 文件的行数，不包括空行(使用 grep -v '^\s*$$' 过滤掉空行，然后使用 wc -l 统计剩余行数)
+
 # ##### global settings #####
 
 # .PHONY: nemu entry testcase kernel run gdb test submit clean count count_

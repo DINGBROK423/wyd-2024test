@@ -3,7 +3,7 @@
 
 #include "all-instr.h"
 
-typedef int (*helper_fun)(swaddr_t);
+typedef int (*helper_fun)(swaddr_t); //函数指针
 static make_helper(_2byte_esc);
 
 #define make_group(name, item0, item1, item2, item3, item4, item5, item6, item7) \
@@ -93,7 +93,7 @@ make_group(group7,
 
 /* TODO: Add more instructions!!! */
 // 函数指针数组
-helper_fun opcode_table [256] = {
+helper_fun opcode_table [256] = {  //每个元素都是一个函数指针，返回值相同，参数列表相似
 /* 0x00 */	inv, inv, inv, inv,
 /* 0x04 */	inv, inv, inv, inv,
 /* 0x08 */	inv, or_r2rm_v, or_rm2r_b, inv,
@@ -140,7 +140,7 @@ helper_fun opcode_table [256] = {
 /* 0xac */	inv, inv, scas_b, inv,
 /* 0xb0 */	mov_i2r_b, mov_i2r_b, mov_i2r_b, mov_i2r_b,
 /* 0xb4 */	mov_i2r_b, mov_i2r_b, mov_i2r_b, mov_i2r_b,
-/* 0xb8 */	mov_i2r_v, mov_i2r_v, mov_i2r_v, mov_i2r_v, 
+/* 0xb8 */	mov_i2r_v, mov_i2r_v, mov_i2r_v, mov_i2r_v,   //0xb8
 /* 0xbc */	mov_i2r_v, mov_i2r_v, mov_i2r_v, mov_i2r_v, 
 /* 0xc0 */	group2_i_b, group2_i_v, inv, inv,
 /* 0xc4 */	inv, inv, mov_i2rm_b, mov_i2rm_v,
@@ -226,10 +226,10 @@ helper_fun _2byte_opcode_table [256] = {
 /* 0xf8 */	inv, inv, inv, inv,
 /* 0xfc */	inv, inv, inv, inv
 };
-
+//exec 定义
 make_helper(exec) {
-	ops_decoded.opcode = instr_fetch(eip, 1);
-	return opcode_table[ ops_decoded.opcode ](eip);
+	ops_decoded.opcode = instr_fetch(eip, 1);  //从内存读一个字节  
+	return opcode_table[ ops_decoded.opcode ](eip);  //eip 函数指针传的参数
 }
 
 static make_helper(_2byte_esc) {

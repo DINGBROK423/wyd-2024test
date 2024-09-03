@@ -36,6 +36,7 @@ void do_int3() {
 }
 
 /* Simulate how the CPU works. */
+//ºËÐÄ
 void cpu_exec(volatile uint32_t n) {
 	if(nemu_state == END) {
 		printf("Program execution has ended. To restart the program, exit NEMU and run again.\n");

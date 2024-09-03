@@ -1,19 +1,19 @@
 #include "cpu/exec/template-start.h"
 
 #include "cpu/decode/modrm.h"
-
-#define decode_r_internal concat3(decode_r_, SUFFIX, _internal)
-#define decode_rm_internal concat3(decode_rm_, SUFFIX, _internal)
-#define decode_i concat(decode_i_, SUFFIX)
+//拼函数名
+#define decode_r_internal concat3(decode_r_, SUFFIX, _internal) //操作数r
+#define decode_rm_internal concat3(decode_rm_, SUFFIX, _internal)  
+#define decode_i concat(decode_i_, SUFFIX)  //i 操作数
 #define decode_a concat(decode_a_, SUFFIX)
 #define decode_r2rm concat(decode_r2rm_, SUFFIX)
 
 /* Ib, Iv */
-make_helper(concat(decode_i_, SUFFIX)) {
+make_helper(concat(decode_i_, SUFFIX)) {  //decode i 一定是源操作数
 	/* eip here is pointing to the immediate */
 	op_src->type = OP_TYPE_IMM;
 	op_src->imm = instr_fetch(eip, DATA_BYTE);
-	op_src->val = op_src->imm;
+	op_src->val = op_src->imm;  
 
 #ifdef DEBUG
 	snprintf(op_src->str, OP_STR_SIZE, "$0x%x", op_src->imm);
@@ -57,9 +57,9 @@ static int concat(decode_a_, SUFFIX) (swaddr_t eip, Operand *op) {
 
 /* eXX: eAX, eCX, eDX, eBX, eSP, eBP, eSI, eDI */
 static int concat3(decode_r_, SUFFIX, _internal) (swaddr_t eip, Operand *op) {
-	op->type = OP_TYPE_REG;
-	op->reg = ops_decoded.opcode & 0x7;
-	op->val = REG(op->reg);
+	op->type = OP_TYPE_REG;  //编码
+	op->reg = ops_decoded.opcode & 0x7;  //低三位
+	op->val = REG(op->reg);  // 寄存器的值
 
 #ifdef DEBUG
 	snprintf(op->str, OP_STR_SIZE, "%%%s", REG_NAME(op->reg));
