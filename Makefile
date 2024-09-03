@@ -65,10 +65,8 @@ clean: clean-cpp
 
 ##### some convinient rules #####
 
-USERPROG := obj/testcase/add  # 定义用户程序路径
-# +USERPROG := obj/testcase/mov-c  #替换
+USERPROG := obj/testcase/mov-c  # 定义用户程序路径
 ENTRY := $(USERPROG)  # 将 ENTRY 定义为用户程序路径
-#+ENTRY := $(kernel_BIN)  #替换
 entry: $(ENTRY)  # `entry` 目标：使用 `objcopy`
 	objcopy -S -O binary $(ENTRY) entry 
 
