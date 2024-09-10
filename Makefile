@@ -26,7 +26,7 @@ LIBC_LIB_DIR := $(LIB_COMMON_DIR)/uclibc/lib
 LIBC := $(LIBC_LIB_DIR)/libc.a
 # 定义 uclibc 的库文件
 
-#FLOAT := obj/$(LIB_COMMON_DIR)/FLOAT/FLOAT.a
+FLOAT := obj/$(LIB_COMMON_DIR)/FLOAT/FLOAT.a
 # 定义浮点运算库（启用）
 
 include config/Makefile.git
@@ -76,7 +76,8 @@ clean: clean-cpp
 
 ##### some convinient rules #####
 
-USERPROG := obj/testcase/mov-c  
+# USERPROG := obj/testcase/mov-c  
+USERPROG := obj/testcase/quadratic-eq
 # 定义用户程序路径
 ENTRY := $(kernel_BIN)
 
