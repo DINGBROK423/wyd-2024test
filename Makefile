@@ -76,7 +76,7 @@ clean: clean-cpp
 
 ##### some convinient rules #####
 
- USERPROG := obj/testcase/mov-c  
+ USERPROG := obj/testcase/hello.c  
 # USERPROG := obj/testcase/quadratic-eq
 # 定义用户程序路径
 ENTRY := $(kernel_BIN)
