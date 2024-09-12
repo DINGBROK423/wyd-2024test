@@ -2,7 +2,7 @@ STU_ID = 3023244344
 
 # DO NOT modify the following code!!!
 
-GITFLAGS = -q --author='tracer-NEMU2020 <tjuics2020@163.com>' --no-verify --allow-empty
+GITFLAGS = -q --author='tracer-ics2016 <tracer@njuics.org>' --no-verify --allow-empty
 
 # prototype: git_commit(msg)
 define git_commit
