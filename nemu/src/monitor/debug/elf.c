@@ -1,6 +1,7 @@
 #include "common.h"
 #include <stdlib.h>
 #include <elf.h>
+// #include "lib-common/uclibc/include/elf.h"
 
 char *exec_file = NULL;
 
