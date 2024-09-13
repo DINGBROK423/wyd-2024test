@@ -8,11 +8,11 @@ void dram_write(hwaddr_t, size_t, uint32_t);
 uint32_t hwaddr_read(hwaddr_t addr, size_t len) {
 	return dram_read(addr, len) & (~0u >> ((4 - len) << 3));
 }
-
+// 读数据：如果cache有数据读cache，否则直接读内存
 void hwaddr_write(hwaddr_t addr, size_t len, uint32_t data) {
 	dram_write(addr, len, data);
 }
-
+// 写数据：如果内存有数据只写cache，否则二者都要写
 uint32_t lnaddr_read(lnaddr_t addr, size_t len) {
 	return hwaddr_read(addr, len);
 }
