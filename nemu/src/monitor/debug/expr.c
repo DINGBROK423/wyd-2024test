@@ -267,7 +267,7 @@ uint32_t expr(char *e, bool *success) {
 			}
 
 			prev_type = tokens[i - 1].type;
-			if( !(prev_type == ')' ||prev_type == ID|| prev_type == NUM || prev_type == REG) ) {
+			if( !(prev_type == ')' || prev_type == ID || prev_type == NUM || prev_type == REG) ) {
 				tokens[i].type = NEG;
 			}
 		}
