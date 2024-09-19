@@ -76,11 +76,11 @@ clean: clean-cpp
 
 ##### some convinient rules #####
 
- USERPROG := obj/testcase/add
-#USERPROG := obj/testcase/quadratic-eq
+#USERPROG := obj/testcase/add
+USERPROG := obj/testcase/quadratic-eq
 # 定义用户程序路径
-#ENTRY := $(kernel_BIN)
-ENTRY := $(USERPROG)
+ENTRY := $(kernel_BIN)
+#ENTRY := $(USERPROG)
 
 # 将 ENTRY 定义为用户程序路径
 entry: $(ENTRY)  
