@@ -5,30 +5,29 @@
 
 CC := gcc # 定义编译器为 gcc
 LD := ld  # 定义链接器为 ld
+# CFLAGS := -MMD -Wall -Werror -c -I$(LIBC_INC_DIR)
 CFLAGS := -MMD -Wall -Werror -c
 # 编译选项：
 # -MMD: 生成依赖文件，用于自动管理文件依赖
 # -Wall: 启用所有警告
-# -Werror: 将警告视为错误
+# -Werror: 将警告视为错误（这个有的时候挺恶心的，但是有助于养成编程的好习惯）
 # -c: 只编译，不链接
+testcase_START_OBJ := $(testcase_OBJ_DIR)/start.o
+testcase_LDFLAGS := -m elf_i386 -e main -Ttext-segment=0x00800000
+LIB_COMMON_DIR := lib-common
+# 定义库的通用目录路径
 
-count:
-	@echo "Counting lines of code (including empty lines)..."
-	@find . -name '*.[ch]' | xargs wc -l
+LIBC_INC_DIR := $(LIB_COMMON_DIR)/uclibc/include
+# 定义 uclibc 的头文件路径
 
-count_:
-	@echo "Counting lines of code (excluding empty lines)..."
-	@find . -name '*.[ch]' | xargs grep -v '^\s*$$' | wc -l
-# count统计当前目录及其子目录中所有 `.c` 和 `.h` 文件的行数，包括空行
-# count_统计当前目录及其子目录中所有 `.c` 和 `.h` 文件的行数，不包括空行(使用 grep -v '^\s*$$' 过滤掉空行，然后使用 wc -l 统计剩余行数)
+LIBC_LIB_DIR := $(LIB_COMMON_DIR)/uclibc/lib
+# 定义 uclibc 的库文件路径
 
-LIB_COMMON_DIR := lib-common  # 定义库的通用目录路径
-LIBC_INC_DIR := $(LIB_COMMON_DIR)/uclibc/include # 定义 uclibc 的头文件路径
-LIBC_LIB_DIR := $(LIB_COMMON_DIR)/uclibc/lib  # 定义 uclibc 的库文件路径
-LIBC := $(LIBC_LIB_DIR)/libc.a  # 定义 uclibc 的库文件
+LIBC := $(LIBC_LIB_DIR)/libc.a
+# 定义 uclibc 的库文件
 
-#FLOAT := obj/$(LIB_COMMON_DIR)/FLOAT/FLOAT.a
-# 定义浮点运算库（目前被注释掉了）
+FLOAT := obj/$(LIB_COMMON_DIR)/FLOAT/FLOAT.a
+# 定义浮点运算库（启用）
 
 include config/Makefile.git
 include config/Makefile.build
@@ -45,10 +44,14 @@ include lib-common/FLOAT/Makefile.part
 include kernel/Makefile.part
 include game/Makefile.part
 
-nemu: $(nemu_BIN)  # 定义构建 `nemu` 的规则，依赖于变量 `$(nemu_BIN)`，`$(nemu_BIN)` 应该是在 `nemu/Makefile.part` 中定义的
-testcase: $(testcase_BIN)  # 定义构建 `testcase` 的规则，依赖于变量 `$(testcase_BIN)`
-kernel: $(kernel_BIN)  # 定义构建 `kernel` 的规则，依赖于变量 `$(kernel_BIN)`
-game: $(game_BIN)  # 定义构建 `game` 的规则，依赖于变量 `$(game_BIN)`
+nemu: $(nemu_BIN)  
+# 定义构建 `nemu` 的规则，依赖于变量 `$(nemu_BIN)`，`$(nemu_BIN)` 应该是在 `nemu/Makefile.part` 中定义的
+testcase: $(testcase_BIN)  
+# 定义构建 `testcase` 的规则，依赖于变量 `$(testcase_BIN)`
+kernel: $(kernel_BIN)  
+# 定义构建 `kernel` 的规则，依赖于变量 `$(kernel_BIN)`
+game: $(game_BIN)  
+# 定义构建 `game` 的规则，依赖于变量 `$(game_BIN)`
 
 
 ##### rules for cleaning the project #####
@@ -73,10 +76,14 @@ clean: clean-cpp
 
 ##### some convinient rules #####
 
-USERPROG := obj/testcase/mov  # 定义用户程序路径
-ENTRY := $(USERPROG)  # 将 ENTRY 定义为用户程序路径
+# USERPROG := obj/testcase/mov-c  
+USERPROG := obj/testcase/quadratic-eq
+# 定义用户程序路径
+ENTRY := $(kernel_BIN)
 
-entry: $(ENTRY)  # `entry` 目标：使用 `objcopy`
+# 将 ENTRY 定义为用户程序路径
+entry: $(ENTRY)  
+# `entry` 目标：使用 `objcopy`
 	objcopy -S -O binary $(ENTRY) entry 
 
 run: $(nemu_BIN) $(USERPROG) entry
@@ -93,6 +100,17 @@ test: $(nemu_BIN) $(testcase_BIN) entry
 
 submit: clean
 	cd .. && zip -r $(STU_ID).zip $(shell pwd | grep -o '[^/]*$$')
+
+count:
+	@echo "Counting lines of code (including empty lines)..."
+	@find . -name '*.[ch]' | xargs wc -l
+
+count_:
+	@echo "Counting lines of code (excluding empty lines)..."
+	@find . -name '*.[ch]' | xargs grep -v '^\s*$$' | wc -l
+# count统计当前目录及其子目录中所有 `.c` 和 `.h` 文件的行数，包括空行
+# count_统计当前目录及其子目录中所有 `.c` 和 `.h` 文件的行数，不包括空行(使用 grep -v '^\s*$$' 过滤掉空行，然后使用 wc -l 统计剩余行数)
+
 # ##### global settings #####
 
 # .PHONY: nemu entry testcase kernel run gdb test submit clean count count_

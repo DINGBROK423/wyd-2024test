@@ -1,7 +1,7 @@
 #include "cpu/exec/helper.h"
-
+//同一模板，三种实现
 #define DATA_BYTE 1
-#include "mov-template.h"
+#include "mov-template.h" //宏为1时，插入代码替换
 #undef DATA_BYTE
 
 #define DATA_BYTE 2

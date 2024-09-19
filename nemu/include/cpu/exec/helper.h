@@ -33,3 +33,4 @@ extern char assembly[];
 	print_asm(str(instr) str(SUFFIX) " %s,%s,%s", op_src->str, op_src2->str, op_dest->str)
 
 #endif
+//  ‘\’转义字符，一行写不下了 // 第12行：do  mov l _ // 第十四行函数：注意instr,SUFFIX是不是宏，如果是宏也会被替换

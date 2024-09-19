@@ -162,6 +162,32 @@ static int cmd_d(char *args) {
 	return 0;
 }
 
+/* Add display backtrace */
+static int cmd_bt(char *args) {
+	const char* find_fun_name(uint32_t eip);
+	struct {
+		swaddr_t prev_ebp;
+		swaddr_t ret_addr;
+		uint32_t args[4];
+	} sf;
+
+	uint32_t ebp = cpu.ebp;
+	uint32_t eip = cpu.eip;
+	int i = 0;
+	while(ebp != 0) {
+		sf.args[0] = swaddr_read(ebp + 8, 4);
+		sf.args[1] = swaddr_read(ebp + 12, 4);
+		sf.args[2] = swaddr_read(ebp + 16, 4);
+		sf.args[3] = swaddr_read(ebp + 20, 4);
+
+		printf("#%d 0x%08x in %s (0x%08x 0x%08x 0x%08x 0x%08x)\n", i, eip, find_fun_name(eip), sf.args[0], sf.args[1], sf.args[2], sf.args[3]);
+		i ++;
+		eip = swaddr_read(ebp + 4, 4);
+		ebp = swaddr_read(ebp, 4);
+	}
+	return 0;
+}
+
 static int cmd_c(char *args) {
 	cpu_exec(-1);
 	return 0;
@@ -187,8 +213,8 @@ static struct {
 	{ "x", "Examine memory", cmd_x },//扫描内存
     { "p", "Evaluate the expression", cmd_p },//表达式求值
 	{ "w", "Set watchpoint", cmd_w },//打上断点
-	{ "d", "Delete watchpoint", cmd_d }//删除断点
-
+	{ "d", "Delete watchpoint", cmd_d },//删除断点
+	{ "bt", "Display backtrace(not 'biantai')", cmd_bt }//显示回溯追踪
 };
 
 #define NR_CMD (sizeof(cmd_table) / sizeof(cmd_table[0]))
@@ -215,6 +241,7 @@ static int cmd_help(char *args) {
 	return 0;
 }
 void ui_mainloop() {
+	//exec(cpu.eip)加载一条指令并执行，返回的是这条指令的长度
 	while(1) {
 		char *str = rl_gets();
 		char *str_end = str + strlen(str);
@@ -224,7 +251,7 @@ void ui_mainloop() {
 		/* treat the remaining string as the arguments,
 		 * which may need further parsing
 		 */
-		char *args = cmd + strlen(cmd) + 1;
+		char *args = cmd + strlen(cmd) + 1; 
 		if(args >= str_end) {
 			args = NULL;
 		}

@@ -7,9 +7,11 @@
 #include <regex.h>
 #include <stdlib.h>
 
+uint32_t look_up_symtab(char *, bool *);
+
 enum {
 	/* TODO: Add more token types */
-	NOTYPE = 256, EQ, NUM, NEQ, OR, AND, REG, REF, NEG
+	NOTYPE = 256, EQ, NUM, NEQ, OR, AND, REG, ID ,REF, NEG
 };   
 //枚举类型，hash值从256开始，防止与ascll码冲突。
 //同时隐式表示了各个运算符运算顺序
@@ -30,6 +32,7 @@ static struct rule {
 	{"0x[0-9a-fA-F]{1,8}", NUM},			// hex（十六进制）
 	{"[0-9]{1,10}", NUM},					// dec（十进制）
 	{"\\$[a-z]{1,31}", REG},				// register names 
+	{"[a-zA-Z_]{1,31}", ID},				// identifiers 
 	{"-", '-'},
 	{"\\*", '*'},
 	{"/", '/'},
@@ -94,10 +97,11 @@ static bool make_token(char *e) {
 				 * of tokens, some extra actions should be performed.
 				 */
 				switch(rules[i].token_type) {
-                                        case NOTYPE: break;
-                                        case NUM:
+					case NOTYPE: break;
+					case NUM:
 					//default: panic("please implement me");
-                                        case REG: sprintf(tokens[nr_token].str, "%.*s", substr_len, substr_start);
+					case ID:
+					case REG: sprintf(tokens[nr_token].str, "%.*s", substr_len, substr_start);
 					default: tokens[nr_token].type = rules[i].token_type;
 							 nr_token ++;
 				}
@@ -138,7 +142,7 @@ static int find_dominated_op(int s, int e, bool *success) {
 	int dominated_op = -1;
 	for(i = s; i <= e; i ++) {
 		switch(tokens[i].type) {
-			case REG: case NUM: break;
+			case REG: case NUM:case ID: break;
 
 			case '(': 
 				bracket_level ++; 
@@ -190,7 +194,9 @@ static uint32_t eval(int s, int e, bool *success) {
 					  break;
 
 			case NUM: val = strtol(tokens[s].str, NULL, 0); break;
-
+			case ID:  val = look_up_symtab(tokens[s].str, success);
+					  if(!*success) { return 0; }
+					  break;
 			default: assert(0);
 		}
 
@@ -261,7 +267,7 @@ uint32_t expr(char *e, bool *success) {
 			}
 
 			prev_type = tokens[i - 1].type;
-			if( !(prev_type == ')' || prev_type == NUM || prev_type == REG) ) {
+			if( !(prev_type == ')' || prev_type == ID || prev_type == NUM || prev_type == REG) ) {
 				tokens[i].type = NEG;
 			}
 		}
@@ -273,7 +279,7 @@ uint32_t expr(char *e, bool *success) {
 			}
 
 			prev_type = tokens[i - 1].type;
-			if( !(prev_type == ')' || prev_type == NUM || prev_type == REG) ) {
+			if( !(prev_type == ')' ||prev_type == ID|| prev_type == NUM || prev_type == REG) ) {
 				tokens[i].type = REF;
 			}
 		}
